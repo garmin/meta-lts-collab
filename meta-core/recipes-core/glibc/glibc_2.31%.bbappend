@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/glibc"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append = " \
     file://CVE-2025-4802-01.patch \

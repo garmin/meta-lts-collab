@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := '${THISDIR}/files:'
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += " \
     file://CVE-2023-52160.patch \
