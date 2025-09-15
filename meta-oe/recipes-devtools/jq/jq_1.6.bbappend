@@ -7,4 +7,4 @@ SRC_URI_append = " \
 
 # fixed-version: Does not affect jq 1.6.
 # Introduced by: https://github.com/jqlang/jq/commit/cf4b48c7ba30cb30e116b523cff036ea481459f6 (jq-1.7rc1)
-CVE_CHECK_CVE_WHITELIST += "CVE-2024-53427"
+CVE_CHECK_WHITELIST += "CVE-2024-53427"
