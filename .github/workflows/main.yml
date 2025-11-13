@@ -1,21 +1,47 @@
-name: CI
+---
+name: Lints and builds all recipes affected by this repository
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "dunfell" branch
   push:
-    branches: [ "dunfell" ]
+    branches: ["dunfell"]
   pull_request:
-    branches: [ "dunfell" ]
+    branches: ["dunfell"]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  lint:
+    runs-on: ubuntu-22.04
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check on scripts
+        run: ruff check scripts
+
+      - name: Run ruff format on scripts
+        run: ruff format scripts/
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint on workflows
+        run: yamllint .github/workflows/
+
+      - name: Bitbake dry-run check
+        uses: ./.github/workflows/bitbake-common.yml
+        with:
+          dry-run: true
+          runner: ubuntu-latest
+
+  build:
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      dry-run: false
+      runner: yocto_build_host

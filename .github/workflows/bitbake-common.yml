@@ -1,0 +1,65 @@
+---
+name: Bitbake Common Steps
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        required: true
+        type: boolean
+      runner:
+        required: true
+        type: string
+
+jobs:
+  bitbake:
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Clone meta-lts-collab
+        uses: actions/checkout@v5
+        path: ./meta-lts-collab
+
+      - name: Clone poky (Dunfell)
+        uses: actions/checkout@v5
+        repository: yoctoproject/poky
+        ref: dunfell
+        path: ./poky
+
+      - name: Clone meta-oe (Dunfell)
+        uses: actions/checkout@v5
+        repository: openembedded/meta-openembedded
+        ref: dunfell
+        path: ./meta-oe
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gawk wget git-core diffstat unzip texinfo gcc-multilib \
+            build-essential chrpath socat cpio python3 python3-pip \
+            python3-pexpect xz-utils debianutils iputils-ping python3-git \
+            python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm \
+            python3-subunit mesa-common-dev
+
+      - name: Setup bitbake build environment
+        run: |
+          # Source build environment
+          source poky/oe-init-build-env
+
+          # Add all layers
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-oe/meta-*
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-lts-collab/*
+          bitbake-layers show-layers
+
+      - name: Get build targets
+        id: targets
+        run: |
+          TARGETS=$($GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py)
+          echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
+
+      - name: Run bitbake
+        run: |
+          if [ "${{ inputs.dry-run }}" = "true" ]; then
+            bitbake --dry-run ${{ steps.targets.outputs.build_targets }}
+          else
+            bitbake ${{ steps.targets.outputs.build_targets }}
+          fi
