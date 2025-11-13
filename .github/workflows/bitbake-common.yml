@@ -1,0 +1,70 @@
+---
+name: Bitbake Common Steps
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      parse-only:
+        required: true
+        type: boolean
+      runner:
+        required: true
+        type: string
+
+jobs:
+  bitbake:
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Clone meta-lts-collab
+        uses: actions/checkout@v5
+        with:
+          path: ./meta-lts-collab
+
+      - name: Clone poky (Dunfell)
+        uses: actions/checkout@v5
+        with:
+          repository: yoctoproject/poky
+          ref: dunfell
+          path: ./poky
+
+      - name: Clone meta-oe (Dunfell)
+        uses: actions/checkout@v5
+        with:
+          repository: openembedded/meta-openembedded
+          ref: dunfell
+          path: ./meta-oe
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gawk wget git-core diffstat unzip texinfo gcc-multilib \
+            build-essential chrpath socat cpio python3 python3-pip \
+            python3-pexpect xz-utils debianutils iputils-ping python3-git \
+            python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
+            python3-subunit mesa-common-dev
+
+      - name: Get build targets
+        id: targets
+        run: |
+          TARGETS=$($GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py)
+          echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
+
+      - name: Setup and run bitbake
+        run: |
+          # Source build environment
+          source poky/oe-init-build-env
+
+          # Add all layers
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-oe/meta-*
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-lts-collab
+          bitbake-layers show-layers
+
+          # Add configurations
+          echo 'DISTRO_FEATURES:append = " pam"' >> conf/auto.conf
+
+          # Run bitbake
+          extra_args=""
+          if [ "${{ inputs.parse-only }}" = "true" ]; then
+            extra_args="--parse-only"
+          fi
+          bitbake $extra_args ${{ steps.targets.outputs.build_targets }}
