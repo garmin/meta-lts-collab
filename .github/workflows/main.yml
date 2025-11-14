@@ -38,6 +38,7 @@ jobs:
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+      only-build-modified: false
       parse-only: true
       runner: ubuntu-22.04
 
@@ -46,5 +47,6 @@ jobs:
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+      only-build-modified: true
       parse-only: false
       runner: yocto_build_host
