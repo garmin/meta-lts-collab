@@ -19,7 +19,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install ruff
-        run: pip install ruff
+        run: pip install ruff==0.14.5
 
       - name: Run ruff check on scripts
         run: ruff check scripts
@@ -28,7 +28,7 @@ jobs:
         run: ruff format scripts/
 
       - name: Install yamllint
-        run: pip install yamllint
+        run: pip install yamllint==1.37.1
 
       - name: Run yamllint on workflows
         run: yamllint .github/workflows/
