@@ -2,8 +2,6 @@
 name: Lints, parses, and builds all recipes provided/modified by meta-lts-collab
 
 on:  # yamllint disable-line rule:truthy
-  push:
-    branches: ["dunfell"]
   pull_request:
     branches: ["dunfell"]
 
