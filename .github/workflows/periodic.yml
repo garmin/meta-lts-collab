@@ -1,0 +1,50 @@
+---
+name: Weekly build of everything in the repository
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: " 0 3 * * SUN"
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Install ruff
+        run: pip install ruff==0.14.5
+
+      - name: Run ruff check on scripts
+        run: ruff check scripts
+
+      - name: Run ruff format on scripts
+        run: ruff format scripts/
+
+      - name: Install yamllint
+        run: pip install yamllint==1.37.1
+
+      - name: Run yamllint on workflows
+        run: yamllint .github/workflows/
+
+  parse:
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref }}
+      only-build-modified: false
+      parse-only: true
+      runner: ubuntu-22.04
+
+  build:
+    needs: parse
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref }}
+      only-build-modified: false
+      parse-only: false
+      runner: yocto_build_host
