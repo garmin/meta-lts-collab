@@ -6,6 +6,9 @@ on:  # yamllint disable-line rule:truthy
       branch:
         required: true
         type: string
+      only-build-modified:
+        required: true
+        type: boolean
       parse-only:
         required: true
         type: boolean
@@ -46,13 +49,26 @@ jobs:
             python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
             python3-subunit mesa-common-dev
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62  # v47
+
       - name: Get build targets
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         id: targets
         run: |
-          TARGETS=$($GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py)
+          if [ "${{ inputs.only-build-modified }}" = "false" ]; then
+            ALL_CHANGED_FILES=""
+          fi
+          TARGETS=$(
+            $GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py \
+              $ALL_CHANGED_FILES
+          )
           echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
 
       - name: Setup and run bitbake
+        if: ${{ steps.targets.outputs.build_targets != '' }}
         run: |
           # Source build environment
           source poky/oe-init-build-env
