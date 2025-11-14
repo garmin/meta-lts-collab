@@ -21,19 +21,19 @@ jobs:
     runs-on: ${{ inputs.runner }}
     steps:
       - name: Clone meta-lts-collab
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
           path: ./meta-lts-collab
 
       - name: Clone poky (${{ inputs.branch }})
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
           repository: yoctoproject/poky
           ref: ${{ inputs.branch }}
           path: ./poky
 
       - name: Clone meta-oe (${{ inputs.branch }})
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
           repository: openembedded/meta-openembedded
           ref: ${{ inputs.branch }}
