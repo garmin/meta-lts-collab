@@ -2,6 +2,8 @@
 name: Weekly build of everything in the repository
 
 on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["dunfell"]
   schedule:
     - cron: " 0 3 * * SUN"
 
