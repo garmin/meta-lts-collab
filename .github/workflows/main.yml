@@ -37,6 +37,7 @@ jobs:
     needs: lint
     uses: ./.github/workflows/bitbake-common.yml
     with:
+      branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
       parse-only: true
       runner: ubuntu-22.04
 
@@ -44,5 +45,6 @@ jobs:
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
     with:
+      branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
       parse-only: false
       runner: yocto_build_host

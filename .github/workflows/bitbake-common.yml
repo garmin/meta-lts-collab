@@ -3,6 +3,9 @@ name: Bitbake Common Steps
 on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
+      branch:
+        required: true
+        type: string
       parse-only:
         required: true
         type: boolean
@@ -19,18 +22,18 @@ jobs:
         with:
           path: ./meta-lts-collab
 
-      - name: Clone poky (Dunfell)
+      - name: Clone poky (${{ inputs.branch }})
         uses: actions/checkout@v5
         with:
           repository: yoctoproject/poky
-          ref: dunfell
+          ref: ${{ inputs.branch }}
           path: ./poky
 
-      - name: Clone meta-oe (Dunfell)
+      - name: Clone meta-oe (${{ inputs.branch }})
         uses: actions/checkout@v5
         with:
           repository: openembedded/meta-openembedded
-          ref: dunfell
+          ref: ${{ inputs.branch }}
           path: ./meta-oe
 
       - name: Install build dependencies
