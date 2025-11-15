@@ -53,3 +53,4 @@ jobs:
       only-build-modified: false
       parse-only: false
       runner: yocto_build_host
+      save-cache: true
