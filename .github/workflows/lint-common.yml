@@ -1,18 +1,18 @@
 ---
-name: Weekly build of everything in the repository
-
+name: Lint Common Steps
 on:  # yamllint disable-line rule:truthy
-  push:
-    branches: ["dunfell"]
-  schedule:
-    - cron: " 0 3 * * SUN"
-
-permissions:
-  contents: read
+  workflow_call:
+    inputs:
+      runner:
+        default: ubuntu-22.04
+        description: 'The runner to execute this workfow with'
+        required: false
+        type: string
 
 jobs:
   lint:
-    runs-on: ubuntu-22.04
+    name: 'Lint scripts & CI'
+    runs-on: ${{ inputs.runner }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
 
@@ -35,22 +35,3 @@ jobs:
 
       - name: Run yamllint on workflows
         run: yamllint .github/workflows/
-
-  parse:
-    needs: lint
-    uses: ./.github/workflows/bitbake-common.yml
-    with:
-      branch: ${{ github.ref }}
-      only-build-modified: false
-      parse-only: true
-      runner: ubuntu-22.04
-
-  build:
-    needs: parse
-    uses: ./.github/workflows/bitbake-common.yml
-    with:
-      branch: ${{ github.ref }}
-      only-build-modified: false
-      parse-only: false
-      runner: yocto_build_host
-      save-cache: true
