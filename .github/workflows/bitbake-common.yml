@@ -102,8 +102,8 @@ jobs:
           bitbake-layers add-layer $GITHUB_WORKSPACE/meta-lts-collab
           bitbake-layers show-layers
 
-          # Add configurations
-          echo 'DISTRO_FEATURES:append = " pam"' >> conf/auto.conf
+          # Add CI configurations
+          echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> conf/auto.conf
 
           # Run bitbake
           extra_args=""
