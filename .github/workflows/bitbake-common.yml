@@ -4,15 +4,19 @@ on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
       branch:
+        description: 'The Yocto branch that is intended to be built'
         required: true
         type: string
       only-build-modified:
+        description: 'If true, bitbake will only build the recipes that are affected by the PR'
         required: true
         type: boolean
       parse-only:
+        description: 'If true, bitbake only parses and does not build'
         required: true
         type: boolean
       runner:
+        description: 'The runner to execute this workfow with'
         required: true
         type: string
       save-cache:
