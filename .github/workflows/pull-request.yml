@@ -1,0 +1,33 @@
+---
+name: PR Validation
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: ["dunfell"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint-common.yml
+
+  parse:
+    name: 'Parse recipes'
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+      only-build-modified: false
+      parse-only: true
+      runner: ubuntu-22.04
+
+  build:
+    name: 'Build recipes'
+    needs: parse
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+      only-build-modified: true
+      parse-only: false
+      runner: yocto_build_host

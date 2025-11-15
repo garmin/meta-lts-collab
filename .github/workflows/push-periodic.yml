@@ -1,0 +1,34 @@
+---
+name: 'Push & Periodic'
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["dunfell"]
+  schedule:
+    - cron: " 0 3 * * SUN"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint-common.yml
+
+  parse:
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref }}
+      only-build-modified: false
+      parse-only: true
+      runner: ubuntu-22.04
+
+  build:
+    needs: parse
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref }}
+      only-build-modified: false
+      parse-only: false
+      runner: yocto_build_host
+      save-cache: true
