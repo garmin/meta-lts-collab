@@ -75,19 +75,20 @@ jobs:
 
       - name: Get changed files
         id: changed-files
+        if: ${{ inputs.only-build-modified }}
         uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62  # v47
 
       - name: Get build targets
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         id: targets
         run: |
-          if [ "${{ inputs.only-build-modified }}" = "false" ]; then
-            ALL_CHANGED_FILES=""
+          if [ "${{ inputs.only-build-modified }}" = "true" ]; then
+            get_bitbake_targets_args="${{ steps.changed-files.outputs.all_changed_files }}"
+          else
+            get_bitbake_targets_args=""
           fi
           TARGETS=$(
             $GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py \
-              $ALL_CHANGED_FILES
+              ${get_bitbake_targets_args}
           )
           echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
 
