@@ -9,6 +9,9 @@ on:  # yamllint disable-line rule:truthy
         required: false
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: 'Lint scripts & CI'
