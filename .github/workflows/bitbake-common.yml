@@ -72,8 +72,8 @@ jobs:
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
         with:
           path: |
-            $GITHUB_WORKSPACE/build/downloads
-            $GITHUB_WORKSPACE/build/sstate-cache
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
           key: ${{ runner.name }}-downloads-and-sstate
 
       - name: Get changed files
@@ -121,6 +121,6 @@ jobs:
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
         with:
           path: |
-            $GITHUB_WORKSPACE/build/downloads
-            $GITHUB_WORKSPACE/build/sstate-cache
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
           key: ${{ steps.cache-restore.outputs.cache-primary-key }}
