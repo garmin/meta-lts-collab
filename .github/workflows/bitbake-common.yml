@@ -89,8 +89,12 @@ jobs:
           else
             get_bitbake_targets_args=""
           fi
+          # changed-files outputs filepaths relative to the repository root
+          # although get-bitbake-targets.py can be called from anywhere, it's
+          # easiest to just cd to the repository root when running this command.
           TARGETS=$(
-            $GITHUB_WORKSPACE/meta-lts-collab/scripts/get-bitbake-targets.py \
+            cd $GITHUB_WORKSPACE/meta-lts-collab &&
+            ./scripts/get-bitbake-targets.py \
               ${get_bitbake_targets_args}
           )
           echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
