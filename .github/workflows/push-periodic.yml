@@ -18,7 +18,7 @@ jobs:
     needs: lint
     uses: ./.github/workflows/bitbake-common.yml
     with:
-      branch: ${{ github.ref }}
+      branch: ${{ github.ref_name }}
       only-build-modified: false
       parse-only: true
       runner: ubuntu-22.04
@@ -27,7 +27,7 @@ jobs:
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
     with:
-      branch: ${{ github.ref }}
+      branch: ${{ github.ref_name }}
       only-build-modified: false
       parse-only: false
       runner: yocto_build_host
