@@ -1,0 +1,23 @@
+---
+name: Clear existing cache
+
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      cache-key:
+        required: true
+        type: string
+
+permissions:
+  actions: write
+
+jobs:
+  delete-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete cache
+        env:
+          CACHE_KEY: ${{ inputs.cache-key }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh cache delete "${CACHE_KEY}" --repo "${GITHUB_REPOSITORY}" --succeed-on-no-caches
