@@ -23,6 +23,11 @@ jobs:
       parse-only: true
       runner: ubuntu-22.04
 
+  clear-cache:  # We will always need to clear out the cache until more cache space is available
+    uses: ./.github/workflows/clear-cache.yml
+    with:
+      cache-key: downloads-and-sstate-${{ github.ref_name }}
+
   build:
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
