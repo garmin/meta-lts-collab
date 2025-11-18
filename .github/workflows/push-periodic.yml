@@ -22,6 +22,7 @@ jobs:
       only-build-modified: false
       parse-only: true
       runner: ubuntu-22.04
+      use-cache: false
 
   clear-cache:  # We will always need to clear out the cache until more cache space is available
     uses: ./.github/workflows/clear-cache.yml

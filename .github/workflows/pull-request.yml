@@ -21,6 +21,7 @@ jobs:
       only-build-modified: false
       parse-only: true
       runner: ubuntu-22.04
+      use-cache: false
 
   build:
     name: 'Build recipes'
