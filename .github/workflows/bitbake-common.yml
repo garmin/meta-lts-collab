@@ -74,7 +74,7 @@ jobs:
           path: |
             ${{ github.workspace }}/build/downloads
             ${{ github.workspace }}/build/sstate-cache
-          key: ${{ runner.name }}-downloads-and-sstate
+          key: downloads-and-sstate-${{ inputs.branch }}
 
       - name: Get changed files
         id: changed-files
