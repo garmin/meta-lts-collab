@@ -32,7 +32,7 @@ jobs:
       cache-key: downloads-and-sstate-${{ github.ref_name }}
 
   build:
-    needs: parse
+    needs: [parse, clear-cache]
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.ref_name }}
