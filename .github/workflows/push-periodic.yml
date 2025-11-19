@@ -25,6 +25,8 @@ jobs:
       use-cache: false
 
   clear-cache:  # We will always need to clear out the cache until more cache space is available
+    permissions:
+      actions: write
     uses: ./.github/workflows/clear-cache.yml
     with:
       cache-key: downloads-and-sstate-${{ github.ref_name }}
