@@ -20,4 +20,4 @@ jobs:
           CACHE_KEY: ${{ inputs.cache-key }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh cache delete "${CACHE_KEY}" --repo "${GITHUB_REPOSITORY}" --succeed-on-no-caches
+          gh cache delete "${CACHE_KEY}" --repo "${GITHUB_REPOSITORY}" || true
