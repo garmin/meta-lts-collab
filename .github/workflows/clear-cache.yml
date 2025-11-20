@@ -7,6 +7,10 @@ on:  # yamllint disable-line rule:truthy
       cache-key:
         required: true
         type: string
+      skip-clear:
+        default: false
+        required: false
+        type: boolean
 
 permissions:
   actions: write
@@ -15,7 +19,12 @@ jobs:
   delete-cache:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip deleting cache
+        if: ${{ inputs.skip-clear }}
+        run: |
+          echo "Skipping cache deletion"
       - name: Delete cache
+        if: ${{ !inputs.skip-clear }}
         env:
           CACHE_KEY: ${{ inputs.cache-key }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
