@@ -30,6 +30,7 @@ jobs:
     uses: ./.github/workflows/clear-cache.yml
     with:
       cache-key: downloads-and-sstate-${{ github.ref_name }}
+      skip-clear: ${{ github.event_name == 'push' }}
 
   build:
     needs: [parse, clear-cache]
@@ -39,4 +40,5 @@ jobs:
       only-build-modified: false
       parse-only: false
       runner: yocto_build_host
-      save-cache: true
+      save-cache: ${{ github.event_name == 'schedule' }}
+      use-cache: ${{ github.event_name == 'push' }}
