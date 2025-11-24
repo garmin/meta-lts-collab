@@ -129,4 +129,4 @@ jobs:
           path: |
             ${{ github.workspace }}/build/downloads
             ${{ github.workspace }}/build/sstate-cache
-          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+          key: downloads-and-sstate-${{ inputs.branch }}-${{ runner.name }}
