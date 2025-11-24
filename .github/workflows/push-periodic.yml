@@ -39,5 +39,5 @@ jobs:
       only-build-modified: false
       parse-only: false
       runner: yocto_build_host
-      save-cache: ${{ github.event_name == 'schedule' }}
+      save-cache: true
       use-cache: ${{ github.event_name == 'push' }}
