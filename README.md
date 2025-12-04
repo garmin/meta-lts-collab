@@ -55,12 +55,21 @@ Patches should be submitted for review via:
 
 ## 6. Continuous Integration (CI)
 
-Ideally, CI will be used to:
+### Weekly build
 
-- Ensure patched recipes build successfully
-- Run cve-check to generate vulnerability reports (similar to Poky)
+All recipes modified or added by the layer are built on Sundays at 03:00 UTC with a clean download and shared state directory. This job is intended to both ensure that the layer is always in a buildable state and to rebuild the download and shared state cache from scratch.
 
-CI may be provided by users of the repository, not the Yocto Project Autobuilder.
+### Pull requests
+
+Every PR that either adds or modifies one or more recipes will trigger bitbake to build each of the recipes. Only the default poky machine (`qemux86-64`) will be tested and it is worth noting that no image builds are performed (Only `do_build` for each recipe). This is intended to provide fast feedback whether or not the PR works or not.
+
+Modifying any configuration or bbclass files included in the layer will trigger all recipes affected by the layer to be rebuilt. This is because it's hard to determine which recipes are modified by bbclass or configuration file modificiations.
+
+There is a small risk that a recipe dependent on a modified recipe breaks because of a change. This would not be detected by CI. However, any recipe provided by meta-core or meta-oe could break in this way and the only way to catch these build errors is to build everything (e.g., `bitbake world`). For this reason, CI is configured to just build the recipes directly modified by a change. However, building all recipes may be explored in the future if cache sizes are increased.
+
+### Push events
+
+All recipes modified or added by the layer are built after changes are merged into a branch. This job matches the weekly build above, however the sstate and download cache is used. The sstate and cache after the build is also saved as the new cache. This allows the cache to follow the tip of the branch, keeping PR builds fast. The sstate cache will likely grow over the week, but the clean weekly build is intended to truncate the cache.
 
 ## 7. Terms of Use / Disclaimer
 
