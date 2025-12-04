@@ -15,9 +15,15 @@
 
 ## 1. Purpose and Scope
 
-The `meta-lts-collab` layer is designed to help Yocto Project users maintain firmware built on end-of-life (EoL) versions of Yocto by sharing security fixes. As cybersecurity regulations evolve, the need for ongoing support of legacy Yocto-based products is expected to grow. This layer enables collaboration and sharing of security patches, fostering a stronger and more secure ecosystem for legacy products.
+The `meta-lts-collab` layer is designed to help Yocto Project users maintain firmware built
+on end-of-life (EoL) versions of Yocto by sharing security fixes. As cybersecurity regulations
+evolve, the need for ongoing support of legacy Yocto-based products is expected to grow. This
+layer enables collaboration and sharing of security patches, fostering a stronger and more
+secure ecosystem for legacy products.
 
-Initially, this layer aims to support recipes from oe-core and meta-oe. Other repositories may be added as needed using dynamic layers. The longevity of support for any particular Yocto version will depend on community interest and contributions; no strict guarantees are defined.
+Initially, this layer aims to support recipes from oe-core and meta-oe. Other repositories
+may be added as needed using dynamic layers. The longevity of support for any particular Yocto
+version will depend on community interest and contributions; no strict guarantees are defined.
 
 ## 2. Dependencies
 
@@ -51,29 +57,47 @@ Patches should be submitted for review via:
 
 - Primary goal: Maintain security patches for recipes from end-of-life upstream layers
 - Patch-level updates with security fixes may be provided
-- Major/minor version upgrades only in exceptional cases when no alternative exists for applying a security fix
+- Major/minor version upgrades only in exceptional cases when no alternative exists for applying a
+  security fix
 
 ## 6. Continuous Integration (CI)
 
 ### Weekly build
 
-All recipes modified or added by the layer are built on Sundays at 03:00 UTC with a clean download and shared state directory. This job is intended to both ensure that the layer is always in a buildable state and to rebuild the download and shared state cache from scratch.
+All recipes modified or added by the layer are built on Sundays at 03:00 UTC with a clean
+download and shared state directory. This job is intended to both ensure that the layer is
+always in a buildable state and to rebuild the download and shared state cache from scratch.
 
 ### Pull requests
 
-Every PR that either adds or modifies one or more recipes will trigger bitbake to build each of the recipes. Only the default poky machine (`qemux86-64`) will be tested and it is worth noting that no image builds are performed (Only `do_build` for each recipe). This is intended to provide fast feedback whether or not the PR works or not.
+Every PR that either adds or modifies one or more recipes will trigger bitbake to build each
+of the recipes. Only the default poky machine (`qemux86-64`) will be tested and it is worth
+noting that no image builds are performed (Only `do_build` for each recipe). This is intended
+to provide fast feedback whether or not the PR works or not.
 
-Modifying any configuration or bbclass files included in the layer will trigger all recipes affected by the layer to be rebuilt. This is because it's hard to determine which recipes are modified by bbclass or configuration file modificiations.
+Modifying any configuration or bbclass files included in the layer will trigger all recipes
+affected by the layer to be rebuilt. This is because it's hard to determine which recipes are
+modified by bbclass or configuration file modificiations.
 
-There is a small risk that a recipe dependent on a modified recipe breaks because of a change. This would not be detected by CI. However, any recipe provided by meta-core or meta-oe could break in this way and the only way to catch these build errors is to build everything (e.g., `bitbake world`). For this reason, CI is configured to just build the recipes directly modified by a change. However, building all recipes may be explored in the future if cache sizes are increased.
+There is a small risk that a recipe dependent on a modified recipe breaks because of a change. This
+would not be detected by CI. However, any recipe provided by meta-core or meta-oe could break
+in this way and the only way to catch these build errors is to build everything (e.g., `bitbake
+world`). For this reason, CI is configured to just build the recipes directly modified by a
+change. However, building all recipes may be explored in the future if cache sizes are increased.
 
 ### Push events
 
-All recipes modified or added by the layer are built after changes are merged into a branch. This job matches the weekly build above, however the sstate and download cache is used. The sstate and cache after the build is also saved as the new cache. This allows the cache to follow the tip of the branch, keeping PR builds fast. The sstate cache will likely grow over the week, but the clean weekly build is intended to truncate the cache.
+All recipes modified or added by the layer are built after changes are merged into a branch. This
+job matches the weekly build above, however the sstate and download cache is used. The sstate
+and cache after the build is also saved as the new cache. This allows the cache to follow the
+tip of the branch, keeping PR builds fast. The sstate cache will likely grow over the week,
+but the clean weekly build is intended to truncate the cache.
 
 ## 7. Terms of Use / Disclaimer
 
-This layer does **not** guarantee that firmware built with it is secure or CVE-free. It is intended for the community to share security fixes for older Yocto versions. Users are responsible for evaluating the security of their builds.
+This layer does **not** guarantee that firmware built with it is secure or CVE-free. It
+is intended for the community to share security fixes for older Yocto versions. Users are
+responsible for evaluating the security of their builds.
 
 ## 8. Adding the meta-lts-collab layer to your build
 
