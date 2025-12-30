@@ -22,3 +22,8 @@ CVE_CHECK_WHITELIST += "CVE-2024-48615"
 # when the bsdunzip command was ported to libarchive. This version is unaffected
 # so this CVE can be dismissed.
 CVE_CHECK_WHITELIST += "CVE-2025-1632"
+
+# cpe-incorrect:
+# Filter code is not supported until 3.6.0 (01a2d32)
+# https://salsa.debian.org/security-tracker-team/security-tracker/-/commit/560d2847519b8d413924294e34eadf3728c2baba
+CVE_CHECK_WHITELIST += "CVE-2025-5915"
