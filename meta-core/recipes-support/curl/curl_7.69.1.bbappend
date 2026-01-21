@@ -3,6 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 SRC_URI_append = " \
     file://CVE-2024-7264.patch \
     file://CVE-2024-8096.patch \
+    file://CVE-2025-10966.patch \
     "
 
 # The use-after-free in question doesn't appear until 7.81.0, therefore we can
