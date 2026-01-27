@@ -18,13 +18,13 @@ def get_bpn(pn_path: Path) -> str:
 
 
 def get_associated_bpns(modified_file: Path) -> List[str]:
-    """Gets all BPNs that are likley assoicated with a modified file
+    """Gets all BPNs that are likley associated with a modified file
 
     Args:
         modified_file (Path): Path to modified file
 
     Returns:
-        List[str]: One more BPNs that are assoicated with the modified file
+        List[str]: One more BPNs that are associated with the modified file
     """
     search_dir = (
         modified_file.parent
@@ -35,7 +35,7 @@ def get_associated_bpns(modified_file: Path) -> List[str]:
 
 
 def get_modified_bpns(modified_files: List[Path]) -> List[str]:
-    """Gets all BPNs that are assoicated with a list of modified files.
+    """Gets all BPNs that are associated with a list of modified files.
 
     Args:
         modified_files (List[Path]): List of files that have been modified.
