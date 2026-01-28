@@ -18,7 +18,7 @@ def get_bpn(pn_path: Path) -> str:
 
 
 def get_associated_bpns(modified_file: Path) -> List[str]:
-    """Gets all BPNs that are likley associated with a modified file
+    """Gets all BPNs that are likely associated with a modified file
 
     Args:
         modified_file (Path): Path to modified file
