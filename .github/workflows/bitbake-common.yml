@@ -7,6 +7,11 @@ on:  # yamllint disable-line rule:truthy
         description: 'The Yocto branch that is intended to be built'
         required: true
         type: string
+      target-image:
+        description: 'The image that is intended to be built'
+        default: 'core-image-minimal'
+        required: false
+        type: string
       only-build-modified:
         description: 'If true, bitbake will only build the recipes that are affected by the PR'
         required: true
@@ -114,13 +119,15 @@ jobs:
 
           # Add CI configurations
           echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> conf/auto.conf
+          printf "IMAGE_INSTALL += \"%s\"\n" \
+            "${{ steps.targets.outputs.build_targets }}" >> conf/auto.conf
 
           # Run bitbake
           extra_args=""
           if [ "${{ inputs.parse-only }}" = "true" ]; then
             extra_args="--parse-only"
           fi
-          bitbake $extra_args ${{ steps.targets.outputs.build_targets }}
+          bitbake $extra_args ${{ inputs.target-image }}
 
       - name: Save downloads and sstate
         if: ${{ inputs.save-cache && steps.targets.outputs.build_targets != '' }}
