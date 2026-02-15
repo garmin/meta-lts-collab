@@ -24,11 +24,12 @@ jobs:
       use-cache: false
 
   build:
-    name: 'Build recipes'
+    name: 'Build and test recipes'
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.base_ref }}
       only-build-modified: true
       parse-only: false
+      run-tests: true
       runner: yocto_build_host
