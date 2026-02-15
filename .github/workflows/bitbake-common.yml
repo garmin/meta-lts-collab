@@ -24,6 +24,11 @@ on:  # yamllint disable-line rule:truthy
         description: 'The runner to execute this workfow with'
         required: true
         type: string
+      run-tests:
+        description: 'If true, runs the testimage tests after building'
+        default: false
+        required: false
+        type: boolean
       save-cache:
         description: 'Saves the download and sstate cache after the build finishes'
         default: false
@@ -128,6 +133,23 @@ jobs:
             extra_args="--parse-only"
           fi
           bitbake $extra_args ${{ inputs.target-image }}
+
+      - name: Enable KVM group perms
+        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | \
+              sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+      - name: Run tests
+        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        run: |
+          # Source build environment
+          source poky/oe-init-build-env
+
+          # Run tests
+          bitbake -c testimage ${{ inputs.target-image }}
 
       - name: Save downloads and sstate
         if: ${{ inputs.save-cache && steps.targets.outputs.build_targets != '' }}
