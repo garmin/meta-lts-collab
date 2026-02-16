@@ -64,26 +64,29 @@ Patches should be submitted for review via:
 
 ### Weekly build
 
-All recipes modified or added by the layer are built on Sundays at 03:00 UTC with a clean
-download and shared state directory. This job is intended to both ensure that the layer is
-always in a buildable state and to rebuild the download and shared state cache from scratch.
+A `core-image-minimal` image is built on Sundays at 03:00 UTC with a clean download and shared
+state directory. Every package added or modified by the layer is included in the image via
+`IMAGE_INSTALL`. After the image is built, `do_testimage` is executed, which runs ptests for
+all packages in the image. This job ensures that the layer is always in a buildable state and
+rebuilds the download and shared state cache from scratch.
 
 ### Pull requests
 
-Every PR that either adds or modifies one or more recipes will trigger bitbake to build each
-of the recipes. Only the default poky machine (`qemux86-64`) will be tested and it is worth
-noting that no image builds are performed (Only `do_build` for each recipe). This is intended
-to provide fast feedback whether or not the PR works or not.
+Every PR that adds or modifies one or more recipes will trigger a `core-image-minimal` image
+build with the modified recipes added via `IMAGE_INSTALL`. Only the default poky machine
+(`qemux86-64`) is tested. After the image is built, `do_testimage` runs ptests for all packages
+included in the image. This provides comprehensive feedback on whether the PR works correctly.
 
 Modifying any configuration or bbclass files included in the layer will trigger all recipes
-affected by the layer to be rebuilt. This is because it's hard to determine which recipes are
-modified by bbclass or configuration file modificiations.
+affected by the layer to be added to the image. This is because it's hard to determine which
+recipes are modified by bbclass or configuration file modifications.
 
-There is a small risk that a recipe dependent on a modified recipe breaks because of a change. This
-would not be detected by CI. However, any recipe provided by meta-core or meta-oe could break
-in this way and the only way to catch these build errors is to build everything (e.g., `bitbake
-world`). For this reason, CI is configured to just build the recipes directly modified by a
-change. However, building all recipes may be explored in the future if cache sizes are increased.
+There is a small risk that a recipe dependent on a modified recipe breaks because of a change.
+This would not be detected by CI. However, any recipe provided by meta-core or meta-oe could
+break in this way and the only way to catch these build errors is to build everything (e.g.,
+`bitbake world`). For this reason, CI is configured to just build the recipes directly modified
+by a change. However, building all recipes may be explored in the future if cache sizes are
+increased.
 
 ### Push events
 
@@ -92,6 +95,8 @@ job matches the weekly build above, however the sstate and download cache is use
 and cache after the build is also saved as the new cache. This allows the cache to follow the
 tip of the branch, keeping PR builds fast. The sstate cache will likely grow over the week,
 but the clean weekly build is intended to truncate the cache.
+
+For specific CI configuration details, see the [`.github/workflows`](.github/workflows) directory.
 
 ## 7. Terms of Use / Disclaimer
 
