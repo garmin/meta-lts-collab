@@ -125,7 +125,7 @@ jobs:
           # Add CI configurations
           AUTO_CONF="$GITHUB_WORKSPACE/build/conf/auto.conf"
           echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> "$AUTO_CONF"
-          printf "IMAGE_INSTALL += \"%s\"\n" \
+          printf "CORE_IMAGE_EXTRA_INSTALL = \" %s\"\n" \
             "${{ steps.targets.outputs.build_targets }}" >> "$AUTO_CONF"
 
           # Verify auto.conf configuration
