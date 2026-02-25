@@ -50,21 +50,21 @@ jobs:
       - name: Clone meta-lts-collab
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
-          path: ./meta-lts-collab
+          path: ${{ github.workspace }}/meta-lts-collab
 
       - name: Clone poky (${{ inputs.branch }})
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
           repository: yoctoproject/poky
           ref: ${{ inputs.branch }}
-          path: ./poky
+          path: ${{ github.workspace }}/poky
 
       - name: Clone meta-oe (${{ inputs.branch }})
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
         with:
           repository: openembedded/meta-openembedded
           ref: ${{ inputs.branch }}
-          path: ./meta-oe
+          path: ${{ github.workspace }}/meta-oe
 
       - name: Install build dependencies
         run: |
@@ -123,9 +123,14 @@ jobs:
           bitbake-layers show-layers
 
           # Add CI configurations
-          echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> conf/auto.conf
+          AUTO_CONF="$GITHUB_WORKSPACE/build/conf/auto.conf"
+          echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> "$AUTO_CONF"
           printf "IMAGE_INSTALL += \"%s\"\n" \
-            "${{ steps.targets.outputs.build_targets }}" >> conf/auto.conf
+            "${{ steps.targets.outputs.build_targets }}" >> "$AUTO_CONF"
+
+          # Verify auto.conf configuration
+          echo "## $AUTO_CONF configuration ##"
+          cat "$AUTO_CONF"
 
           # Run bitbake
           extra_args=""
@@ -146,7 +151,7 @@ jobs:
         if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
         run: |
           # Source build environment
-          source poky/oe-init-build-env
+          source $GITHUB_WORKSPACE/poky/oe-init-build-env
 
           # Run tests
           bitbake -c testimage ${{ inputs.target-image }}
