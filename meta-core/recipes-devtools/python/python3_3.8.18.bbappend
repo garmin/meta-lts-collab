@@ -6,4 +6,3 @@ SRC_URI_append = " \
 "
 
 CVE_PRODUCT = "python:python python_software_foundation:python"
-
