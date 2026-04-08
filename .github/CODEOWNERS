@@ -1,0 +1,6 @@
+# Default owners
+* @colin-pm @bwerl
+
+# CI & Script configurations
+/.github/ @colin-pm @same-code-different-day
+/scripts/ @colin-pm @same-code-different-day

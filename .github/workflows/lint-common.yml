@@ -1,0 +1,40 @@
+---
+name: Lint Common Steps
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      runner:
+        default: ubuntu-22.04
+        description: 'The runner to execute this workfow with'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: 'Lint scripts & CI'
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6
+        with:
+          python-version: '3.10'
+
+      - name: Install ruff
+        run: pip install ruff==0.14.5
+
+      - name: Run ruff check on scripts
+        run: ruff check scripts
+
+      - name: Run ruff format on scripts
+        run: ruff format scripts/
+
+      - name: Install yamllint
+        run: pip install yamllint==1.37.1
+
+      - name: Run yamllint on workflows
+        run: yamllint .github/workflows/

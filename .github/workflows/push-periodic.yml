@@ -1,0 +1,44 @@
+---
+name: 'Push & Periodic'
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["kirkstone"]
+  schedule:
+    - cron: " 0 3 * * SUN"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint-common.yml
+
+  parse:
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref_name }}
+      only-build-modified: false
+      parse-only: true
+      runner: ubuntu-22.04
+      use-cache: false
+
+  clear-cache:  # We will always need to clear out the cache until more cache space is available
+    permissions:
+      actions: write
+    uses: ./.github/workflows/clear-cache.yml
+    with:
+      skip-clear: ${{ github.event_name != 'schedule' }}
+
+  build:
+    needs: [parse, clear-cache]
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.ref_name }}
+      only-build-modified: false
+      parse-only: false
+      run-tests: ${{ github.event_name == 'schedule' }}
+      runner: yocto_build_host
+      save-cache: false
+      use-cache: ${{ github.event_name == 'push' }}
