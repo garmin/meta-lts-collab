@@ -1,0 +1,35 @@
+---
+name: PR Validation
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: ["kirkstone"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint-common.yml
+
+  parse:
+    name: 'Parse recipes'
+    needs: lint
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.base_ref }}
+      only-build-modified: false
+      parse-only: true
+      runner: ubuntu-22.04
+      use-cache: false
+
+  build:
+    name: 'Build and test recipes'
+    needs: parse
+    uses: ./.github/workflows/bitbake-common.yml
+    with:
+      branch: ${{ github.base_ref }}
+      only-build-modified: true
+      parse-only: false
+      run-tests: true
+      runner: yocto_build_host

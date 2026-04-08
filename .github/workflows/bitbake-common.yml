@@ -1,0 +1,166 @@
+---
+name: Bitbake Common Steps
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      branch:
+        description: 'The Yocto branch that is intended to be built'
+        required: true
+        type: string
+      target-image:
+        description: 'The image that is intended to be built'
+        default: 'core-image-minimal'
+        required: false
+        type: string
+      only-build-modified:
+        description: 'If true, bitbake will only build the recipes that are affected by the PR'
+        required: true
+        type: boolean
+      parse-only:
+        description: 'If true, bitbake only parses and does not build'
+        required: true
+        type: boolean
+      runner:
+        description: 'The runner to execute this workfow with'
+        required: true
+        type: string
+      run-tests:
+        description: 'If true, runs the testimage tests after building'
+        default: false
+        required: false
+        type: boolean
+      save-cache:
+        description: 'Saves the download and sstate cache after the build finishes'
+        default: false
+        required: false
+        type: boolean
+      use-cache:
+        description: 'Restores the download and sstate cache before building'
+        default: true
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  bitbake:
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Clone meta-lts-collab
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          path: ${{ github.workspace }}/meta-lts-collab
+
+      - name: Clone poky (${{ inputs.branch }})
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          repository: yoctoproject/poky
+          ref: ${{ inputs.branch }}
+          path: ${{ github.workspace }}/poky
+
+      - name: Clone meta-oe (${{ inputs.branch }})
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          repository: openembedded/meta-openembedded
+          ref: ${{ inputs.branch }}
+          path: ${{ github.workspace }}/meta-oe
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gawk wget git-core diffstat unzip texinfo gcc-multilib \
+            build-essential chrpath socat cpio python3 python3-pip \
+            python3-pexpect xz-utils debianutils iputils-ping python3-git \
+            python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
+            python3-subunit mesa-common-dev
+
+      - name: Restore downloads and sstate
+        id: cache-restore
+        if: ${{ inputs.use-cache }}
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
+        with:
+          path: |
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
+          key: downloads-and-sstate-${{ inputs.branch }}-${{ runner.name }}
+          restore-keys: |
+            downloads-and-sstate-${{ inputs.branch }}
+
+      - name: Get changed files
+        id: changed-files
+        if: ${{ inputs.only-build-modified }}
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62  # v47
+
+      - name: Get build targets
+        id: targets
+        run: |
+          if [ "${{ inputs.only-build-modified }}" = "true" ]; then
+            get_bitbake_targets_args="${{ steps.changed-files.outputs.all_changed_files }}"
+          else
+            get_bitbake_targets_args=""
+          fi
+          # changed-files outputs filepaths relative to the repository root
+          # although get-bitbake-targets.py can be called from anywhere, it's
+          # easiest to just cd to the repository root when running this command.
+          TARGETS=$(
+            cd $GITHUB_WORKSPACE/meta-lts-collab &&
+            ./scripts/get-bitbake-targets.py \
+              ${get_bitbake_targets_args}
+          )
+          echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
+
+      - name: Setup and run bitbake
+        if: ${{ steps.targets.outputs.build_targets != '' }}
+        run: |
+          # Source build environment
+          source poky/oe-init-build-env
+
+          # Add all layers
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-oe/meta-*
+          bitbake-layers add-layer $GITHUB_WORKSPACE/meta-lts-collab
+          bitbake-layers show-layers
+
+          # Add CI configurations
+          AUTO_CONF="$GITHUB_WORKSPACE/build/conf/auto.conf"
+          echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> "$AUTO_CONF"
+          printf "CORE_IMAGE_EXTRA_INSTALL = \" %s\"\n" \
+            "${{ steps.targets.outputs.build_targets }}" >> "$AUTO_CONF"
+
+          # Verify auto.conf configuration
+          echo "## $AUTO_CONF configuration ##"
+          cat "$AUTO_CONF"
+
+          # Run bitbake
+          extra_args=""
+          if [ "${{ inputs.parse-only }}" = "true" ]; then
+            extra_args="--parse-only"
+          fi
+          bitbake $extra_args ${{ inputs.target-image }}
+
+      - name: Enable KVM group perms
+        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | \
+              sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+      - name: Run tests
+        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        run: |
+          # Source build environment
+          source $GITHUB_WORKSPACE/poky/oe-init-build-env
+
+          # Run tests
+          bitbake -c testimage ${{ inputs.target-image }}
+
+      - name: Save downloads and sstate
+        if: ${{ inputs.save-cache && steps.targets.outputs.build_targets != '' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
+        with:
+          path: |
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
+          key: downloads-and-sstate-${{ inputs.branch }}-${{ runner.name }}
