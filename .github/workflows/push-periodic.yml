@@ -41,4 +41,4 @@ jobs:
       run-tests: ${{ github.event_name == 'schedule' }}
       runner: yocto_build_host
       save-cache: true
-      use-cache: ${{ github.event_name == 'push' }}
+      use-cache: true
