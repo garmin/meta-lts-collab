@@ -1,6 +1,6 @@
 Don't refuse to build afalgeng if cross-compiling or the host kernel is too old.
 
-Upstream-Status: Submitted [hhttps://github.com/openssl/openssl/pull/7688]
+Upstream-Status: Backport [https://github.com/openssl/openssl/commit/9e1a54f4a187195fc417ad0f90e84d208d478968]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Index: openssl-3.0.4/Configure
