@@ -38,3 +38,9 @@ jobs:
 
       - name: Run yamllint on workflows
         run: yamllint .github/workflows/
+
+      - name: Install oelint-adv
+        run: pip install oelint-adv==9.8.0
+
+      - name: Run oelint-adv
+        run: oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')
