@@ -60,6 +60,7 @@ CFLAGS:append:class-nativesdk = " -DOPENSSLDIR=/not/builtin -DENGINESDIR=/not/bu
 # The default is to trust upstream choices.
 DEPRECATED_CRYPTO_FLAGS ?= ""
 
+# nooelint: oelint.vars.pathhardcode.bindir
 do_configure () {
 	# When we upgrade glibc but not uninative we see obtuse failures in openssl. Make
 	# the issue really clear that perl isn't functional due to symbol mismatch issues.
@@ -253,7 +254,7 @@ CONFFILES:openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
 
 RRECOMMENDS:libcrypto += "openssl-conf ${PN}-ossl-module-legacy"
 RDEPENDS:${PN}-misc = "perl"
-RDEPENDS:${PN}-ptest += "openssl-bin perl perl-modules bash sed"
+RDEPENDS:${PN}-ptest += "bash openssl-bin perl perl-modules sed"
 
 RDEPENDS:${PN}-bin += "openssl-conf"
 
