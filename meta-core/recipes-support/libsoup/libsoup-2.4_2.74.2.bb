@@ -7,7 +7,7 @@ SECTION = "x11/gnome/libs"
 LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
-DEPENDS = "glib-2.0 glib-2.0-native libxml2 sqlite3 libpsl"
+DEPENDS = "glib-2.0 glib-2.0-native libpsl libxml2 sqlite3"
 
 SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 

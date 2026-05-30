@@ -14,7 +14,7 @@ Update the comments in sudo.conf.in to avoid the conflict.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
-Upstream-Status: Inappropriate [OE configuration specific]
+Upstream-Status: Inappropriate [oe-specific]
 ---
  examples/sudo.conf.in | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

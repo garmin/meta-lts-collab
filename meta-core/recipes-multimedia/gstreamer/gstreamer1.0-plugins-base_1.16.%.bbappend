@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI += " \
+SRC_URI += "\
     file://CVE-2024-47600.patch \
     file://CVE-2023-37327.patch \
     file://CVE-2023-37328.patch \
