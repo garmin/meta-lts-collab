@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install ruff
-        run: pip install ruff==0.14.5
+      - name: Install tools
+        run: pip install -r .github/ci-requirements.txt
 
       - name: Run ruff check on scripts
         run: ruff check scripts
@@ -33,14 +33,8 @@ jobs:
       - name: Run ruff format on scripts
         run: ruff format scripts/
 
-      - name: Install yamllint
-        run: pip install yamllint==1.37.1
-
       - name: Run yamllint on workflows
         run: yamllint .github/workflows/
-
-      - name: Install oelint-adv
-        run: pip install oelint-adv==9.8.2
 
       - name: Run oelint-adv
         run: oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')
