@@ -1,0 +1,7 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/.github/"
+    schedule:
+      interval: "weekly"
+    target-branch: kirkstone
