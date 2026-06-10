@@ -2,6 +2,8 @@
 
 # meta-lts-collab
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13092/badge)](https://www.bestpractices.dev/projects/13092)
+
 ## Table of Contents
 
 1. [Purpose and Scope](#1-purpose-and-scope)
