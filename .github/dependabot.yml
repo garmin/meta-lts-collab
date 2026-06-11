@@ -8,5 +8,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      internal: "weekly"
+      interval: "weekly"
     target-branch: kirkstone
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: dunfell
+
