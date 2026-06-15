@@ -5,14 +5,25 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: kirkstone
+    groups:
+      requirements-dev:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     target-branch: kirkstone
+    groups:
+      kirkstone-actions:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     target-branch: dunfell
-
+    groups:
+      dunfell-actions:
+        patterns:
+          - "*"
