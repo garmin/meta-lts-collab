@@ -6,7 +6,16 @@ updates:
       interval: "weekly"
     target-branch: kirkstone
     groups:
-      requirements-dev:
+      kirkstone-pip:
+        patterns:
+          - "*"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: dunfell
+    groups:
+      dunfell-pip:
         patterns:
           - "*"
   - package-ecosystem: "github-actions"
