@@ -12,20 +12,13 @@ SRC_URI = "https://github.com/openssl/openssl/releases/download/openssl-${PV}/op
            file://0001-buildinfo-strip-sysroot-and-debug-prefix-map-from-co.patch \
            file://afalg.patch \
            file://0001-Configure-do-not-tweak-mips-cflags.patch \
-           file://CVE-2024-41996.patch \
-           file://CVE-2023-50781-1.patch \
-           file://CVE-2023-50781-2.patch \
-           file://CVE-2023-50781-3.patch \
-           file://CVE-2023-50781-4.patch \
-           file://CVE-2023-50781-5.patch \
-           file://CVE-2023-50781-6.patch \
           "
 
 SRC_URI:append:class-nativesdk = " \
            file://environment.d-openssl.sh \
            "
 
-SRC_URI[sha256sum] = "c80a01dfc70ece4dc21168932c37739042d404d46ccc81a5986dd75314ecda6f"
+SRC_URI[sha256sum] = "617e29af8e421f46649484a4937e48c685e47f46488167c982f88bc4ec1d522f"
 
 inherit lib_package multilib_header multilib_script ptest perlnative
 MULTILIB_SCRIPTS = "${PN}-bin:${bindir}/c_rehash"
