@@ -104,15 +104,24 @@ jobs:
           # changed-files outputs filepaths relative to the repository root
           # although get-bitbake-targets.py can be called from anywhere, it's
           # easiest to just cd to the repository root when running this command.
-          TARGETS=$(
+          NATIVE_TARGETS=$(
             cd $GITHUB_WORKSPACE/meta-lts-collab &&
             ./scripts/get-bitbake-targets.py \
+              --native \
               ${get_bitbake_targets_args}
           )
-          echo "build_targets=$TARGETS" >> $GITHUB_OUTPUT
+          IMAGE_TARGETS=$(
+            cd $GITHUB_WORKSPACE/meta-lts-collab &&
+            ./scripts/get-bitbake-targets.py \
+              --image \
+              ${get_bitbake_targets_args}
+          )
+          echo "native_targets=$NATIVE_TARGETS" >> $GITHUB_OUTPUT
+          echo "image_targets=$IMAGE_TARGETS" >> $GITHUB_OUTPUT
+          echo "all_build_targets=$NATIVE_TARGETS $IMAGE_TARGETS" >> $GITHUB_OUTPUT
 
       - name: Setup and run bitbake
-        if: ${{ steps.targets.outputs.build_targets != '' }}
+        if: ${{ steps.targets.outputs.all_build_targets != '' }}
         run: |
           # Source build environment
           source poky/oe-init-build-env
@@ -126,7 +135,7 @@ jobs:
           AUTO_CONF="$GITHUB_WORKSPACE/build/conf/auto.conf"
           echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> "$AUTO_CONF"
           printf "CORE_IMAGE_EXTRA_INSTALL = \" %s\"\n" \
-            "${{ steps.targets.outputs.build_targets }}" >> "$AUTO_CONF"
+            "${{ steps.targets.outputs.image_targets }}" >> "$AUTO_CONF"
 
           # Verify auto.conf configuration
           echo "## $AUTO_CONF configuration ##"
@@ -137,10 +146,10 @@ jobs:
           if [ "${{ inputs.parse-only }}" = "true" ]; then
             extra_args="--parse-only"
           fi
-          bitbake $extra_args ${{ inputs.target-image }}
+          bitbake $extra_args ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
 
       - name: Enable KVM group perms
-        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
         run: |
             echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | \
               sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -148,7 +157,7 @@ jobs:
             sudo udevadm trigger --name-match=kvm
 
       - name: Run tests
-        if: ${{ inputs.run-tests && steps.targets.outputs.build_targets != '' }}
+        if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
         run: |
           # Source build environment
           source $GITHUB_WORKSPACE/poky/oe-init-build-env
@@ -157,8 +166,8 @@ jobs:
           bitbake -c testimage ${{ inputs.target-image }}
 
       - name: Save downloads and sstate
-        if: ${{ inputs.save-cache && steps.targets.outputs.build_targets != '' }}
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        if: ${{ inputs.save-cache && steps.targets.outputs.all_build_targets != '' }}
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
         with:
           path: |
             ${{ github.workspace }}/build/downloads
