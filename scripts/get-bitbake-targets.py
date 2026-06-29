@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
+from enum import Enum
 from itertools import chain
 from pathlib import Path
 from typing import List, Optional
+
+NATIVE_ONLY_FILE = Path(__file__).resolve().parent / "native-only.txt"
+NATIVE_ONLY_BPNS = set(
+    line.strip() for line in NATIVE_ONLY_FILE.read_text().splitlines() if line.strip()
+)
+
+
+class BPNFilter(Enum):
+    ALL = "all"
+    IMAGE = "image"
+    NATIVE = "native"
 
 
 def get_bpn(pn_path: Path) -> str:
@@ -14,7 +26,8 @@ def get_bpn(pn_path: Path) -> str:
     Returns:
         str: The base product name of the recipe
     """
-    return pn_path.stem.split("_")[0]
+    bpn = pn_path.stem.split("_")[0]
+    return bpn if bpn not in NATIVE_ONLY_BPNS else f"{bpn}-native"
 
 
 def get_associated_bpns(modified_file: Path) -> List[str]:
@@ -65,20 +78,45 @@ def get_all_bpns() -> List[str]:
     return sorted(list(map(get_bpn, layer_dir.rglob("*.bb*"))))
 
 
-def get_bpns(modified_files: Optional[List[Path]] = None) -> List[str]:
+def get_bpns(
+    modified_files: Optional[List[Path]] = None, bpn_filter: BPNFilter = BPNFilter.ALL
+) -> List[str]:
     """Either gets a list of all the BPNs in the layer, or just the BPNs that are associated with modified files.
 
     Args:
         modified_files (Optional[List[Path]], optional): Files that have been modified. Defaults to None.
+        bpn_filter (BPNFilter, optional): Whether to only return native or image BPNs. Defaults to All.
 
     Returns:
         List[str]: All BPNs in the layer, or all associated BPNs if modified files are provided
     """
-    return get_modified_bpns(modified_files) if modified_files else get_all_bpns()
+    bpns = get_modified_bpns(modified_files) if modified_files else get_all_bpns()
+    if bpn_filter == BPNFilter.NATIVE:
+        return list(filter(lambda bpn: bpn.rstrip("-native") in NATIVE_ONLY_BPNS, bpns))
+    elif bpn_filter == BPNFilter.IMAGE:
+        return list(
+            filter(lambda bpn: bpn.rstrip("-native") not in NATIVE_ONLY_BPNS, bpns)
+        )
+    return bpns
 
 
 def main() -> None:
     parser = ArgumentParser("Gets bitbake targets to build")
+    recipe_type = parser.add_mutually_exclusive_group(required=False)
+    recipe_type.add_argument(
+        "--image",
+        action="store_const",
+        dest="bpn_filter",
+        const=BPNFilter.IMAGE,
+        help="Return BPNs that are images only",
+    )
+    recipe_type.add_argument(
+        "--native",
+        action="store_const",
+        dest="bpn_filter",
+        const=BPNFilter.NATIVE,
+        help="Return BPNs that are native-only",
+    )
     parser.add_argument(
         "changed_files",
         nargs="*",
@@ -89,8 +127,9 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    bpn_filter = args.bpn_filter if args.bpn_filter else BPNFilter.ALL
 
-    print(" ".join(get_bpns(getattr(args, "changed_files", None))))
+    print(" ".join(get_bpns(getattr(args, "changed_files", None), bpn_filter)))
 
 
 if __name__ == "__main__":
