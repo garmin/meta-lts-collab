@@ -1,7 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append = " \
-    file://CVE-2026-50292.patch \
+    file://CVE-2026-50292-01.patch \
+    file://CVE-2026-50292-02.patch \
     "
 
 # cpe-incorrect:
