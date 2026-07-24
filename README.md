@@ -108,7 +108,7 @@ validation can be performed locally by following the steps below:
 
     ```
     $ mkdir meta-lts-collab-build
-    $ cd meta-lts-collab build
+    $ cd meta-lts-collab-build
     ```
 
 2. Clone down all layers
@@ -123,7 +123,7 @@ validation can be performed locally by following the steps below:
 
     ```
     $ source poky/oe-init-build-env
-    $ bitbake-layers add-layer ./meta-oe/meta-*
+    $ bitbake-layers add-layer ./meta-openembedded/meta-*
     $ bitbake-layers add-layer ./meta-lts-collab
     ```
 
@@ -138,6 +138,12 @@ validation can be performed locally by following the steps below:
 
     ```
     CORE_IMAGE_EXTRA_INSTALL = "openssl"
+    ```
+
+    - To build all packages of this layer, meta-lts-collab/scripts/get-bitbake-targets.py can be used
+
+    ```
+    echo "CORE_IMAGE_EXTRA_INSTALL = \"$(./meta-lts-collab/scripts/get-bitbake-targets.py --image)\"" >> build/conf/local.conf
     ```
 
 6. Build and run test image
