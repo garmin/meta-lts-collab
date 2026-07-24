@@ -114,6 +114,15 @@ jobs:
       - name: Setup and run bitbake
         if: ${{ steps.targets.outputs.build_targets != '' }}
         run: |
+          # Install buildtools
+          $GITHUB_WORKSPACE/poky/scripts/install-buildtools \
+            -u https://downloads.yoctoproject.org/releases/yocto/yocto-3.1.33/buildtools/ \
+            --without-extended-buildtools \
+            -d $GITHUB_WORKSPACE/buildtools
+
+          # Source buildtools
+          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
+
           # Source build environment
           source poky/oe-init-build-env
 
