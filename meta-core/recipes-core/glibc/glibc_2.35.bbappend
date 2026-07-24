@@ -6,6 +6,7 @@ SRC_URI:append = " \
     file://CVE-2026-4438.patch \
     file://CVE-2026-5450.patch \
     file://CVE-2026-5928.patch \
+    file://CVE-2026-5435.patch \
 "
 
 # glibc https://nvd.nist.gov/vuln/detail/CVE-2026-3904
