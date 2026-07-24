@@ -75,7 +75,7 @@ def get_all_bpns() -> List[str]:
         List[str]: List of all BPNs found in the layer.
     """
     layer_dir = Path(__file__).resolve().parent.parent
-    return sorted(list(map(get_bpn, layer_dir.rglob("*.bb*"))))
+    return sorted(list(map(get_bpn, filter(lambda x: x.suffix in (".bb", ".bbappend"), layer_dir.rglob("*.bb*")))))
 
 
 def get_bpns(
