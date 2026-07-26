@@ -10,4 +10,5 @@ SRC_URI_append = " \
     file://CVE-2025-6021.patch \
     file://CVE-2022-49043.patch \
     file://CVE-2025-9714.patch \
+    file://CVE-2025-8732.patch \
     "
