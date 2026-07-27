@@ -98,10 +98,14 @@ def get_bpns(
     """
     bpns = get_modified_bpns(modified_files) if modified_files else get_all_bpns()
     if bpn_filter == BPNFilter.NATIVE:
-        return list(filter(lambda bpn: bpn.rstrip("-native") in NATIVE_ONLY_BPNS, bpns))
+        return list(
+            filter(lambda bpn: bpn.removesuffix("-native") in NATIVE_ONLY_BPNS, bpns)
+        )
     elif bpn_filter == BPNFilter.IMAGE:
         return list(
-            filter(lambda bpn: bpn.rstrip("-native") not in NATIVE_ONLY_BPNS, bpns)
+            filter(
+                lambda bpn: bpn.removesuffix("-native") not in NATIVE_ONLY_BPNS, bpns
+            )
         )
     return bpns
 
