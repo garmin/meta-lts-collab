@@ -18,4 +18,8 @@ SRC_URI_append = " \
     file://CVE-2026-28389-01.patch \
     file://CVE-2026-28389-02.patch \
     file://binary-CVE-2026-28389.tar;subdir=${BP} \
+    file://CVE-2026-28390-01.patch \
+    file://CVE-2026-28390-02.patch \
+    file://CVE-2026-28390-03.patch \
+    file://CVE-2026-28390-04.patch \
     "
