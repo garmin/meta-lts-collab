@@ -12,6 +12,11 @@ on:  # yamllint disable-line rule:truthy
         default: 'core-image-minimal'
         required: false
         type: string
+      use-systemd:
+        description: 'If Systemd should be used or not'
+        default: false
+        required: false
+        type: boolean
       only-build-modified:
         description: 'If true, bitbake will only build the recipes that are affected by the PR'
         required: true
@@ -136,6 +141,14 @@ jobs:
           echo "require $GITHUB_WORKSPACE/meta-lts-collab/conf/ci.conf" >> "$AUTO_CONF"
           printf "CORE_IMAGE_EXTRA_INSTALL = \" %s\"\n" \
             "${{ steps.targets.outputs.image_targets }}" >> "$AUTO_CONF"
+
+          # Optional: Add Systemd configuration
+          if [ "${{ inputs.use-systemd }}" = "true" ]; then
+            echo "DISTRO_FEATURES:append = \" systemd usrmerge\"" >> "$AUTO_CONF"
+            echo "DISTRO_FEATURES_BACKFILL_CONSIDERED += \"sysvinit\"" >> "$AUTO_CONF"
+            echo "VIRTUAL-RUNTIME_init_manager = \"systemd\"" >> "$AUTO_CONF"
+            echo "VIRTUAL-RUNTIME_initscripts = \"systemd-compat-units\"" >> "$AUTO_CONF"
+          fi
 
           # Verify auto.conf configuration
           echo "## $AUTO_CONF configuration ##"

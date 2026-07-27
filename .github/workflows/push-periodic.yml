@@ -25,6 +25,9 @@ jobs:
       use-cache: false
 
   build:
+    strategy:
+      matrix:
+        systemd: [true, false]
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
     with:
@@ -35,3 +38,4 @@ jobs:
       runner: yocto_build_host
       save-cache: true
       use-cache: ${{ github.event_name == 'push' }}
+      use-systemd: ${{ matrix.systemd }}
