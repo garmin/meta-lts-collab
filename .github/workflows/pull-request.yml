@@ -24,7 +24,10 @@ jobs:
       use-cache: false
 
   build:
-    name: 'Build and test recipes'
+    name: 'Build and test recipes (Systemd: ${{ matrix.systemd }})'
+    strategy:
+      matrix:
+        systemd: [true, false]
     needs: parse
     uses: ./.github/workflows/bitbake-common.yml
     with:
@@ -33,3 +36,4 @@ jobs:
       parse-only: false
       run-tests: true
       runner: yocto_build_host
+      use-systemd: ${{ matrix.systemd }}
