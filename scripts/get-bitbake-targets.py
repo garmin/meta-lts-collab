@@ -97,6 +97,11 @@ def get_bpns(
         List[str]: All BPNs in the layer, or all associated BPNs if modified files are provided
     """
     bpns = get_modified_bpns(modified_files) if modified_files else get_all_bpns()
+
+    # We never want Systemd in the list of bpns
+    if "systemd" in bpns:
+        bpns.remove("systemd")
+
     if bpn_filter == BPNFilter.NATIVE:
         return list(
             filter(lambda bpn: bpn.removesuffix("-native") in NATIVE_ONLY_BPNS, bpns)
