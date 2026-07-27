@@ -3,12 +3,11 @@ from argparse import ArgumentParser
 from enum import Enum
 from itertools import chain
 from pathlib import Path
-from typing import List, Optional
 
 NATIVE_ONLY_FILE = Path(__file__).resolve().parent / "native-only.txt"
-NATIVE_ONLY_BPNS = set(
+NATIVE_ONLY_BPNS = {
     line.strip() for line in NATIVE_ONLY_FILE.read_text().splitlines() if line.strip()
-)
+}
 
 
 class BPNFilter(Enum):
@@ -30,7 +29,7 @@ def get_bpn(pn_path: Path) -> str:
     return bpn if bpn not in NATIVE_ONLY_BPNS else f"{bpn}-native"
 
 
-def get_associated_bpns(modified_file: Path) -> List[str]:
+def get_associated_bpns(modified_file: Path) -> list[str]:
     """Gets all BPNs that are likely associated with a modified file
 
     Args:
@@ -47,7 +46,7 @@ def get_associated_bpns(modified_file: Path) -> List[str]:
     return list(map(get_bpn, search_dir.glob("*.bb*")))
 
 
-def get_modified_bpns(modified_files: List[Path]) -> List[str]:
+def get_modified_bpns(modified_files: list[Path]) -> list[str]:
     """Gets all BPNs that are associated with a list of modified files.
 
     Args:
@@ -65,22 +64,29 @@ def get_modified_bpns(modified_files: List[Path]) -> List[str]:
     ):
         return get_all_bpns()
     # Otherwise get all possibly modified recipe BPNs
-    return sorted(list(set(chain(*map(get_associated_bpns, modified_files)))))
+    return sorted(set(chain(*map(get_associated_bpns, modified_files))))
 
 
-def get_all_bpns() -> List[str]:
+def get_all_bpns() -> list[str]:
     """Returns all BPNs found in the layer.
 
     Returns:
         List[str]: List of all BPNs found in the layer.
     """
     layer_dir = Path(__file__).resolve().parent.parent
-    return sorted(list(map(get_bpn, filter(lambda x: x.suffix in (".bb", ".bbappend"), layer_dir.rglob("*.bb*")))))
+    return sorted(
+        map(
+            get_bpn,
+            filter(
+                lambda x: x.suffix in (".bb", ".bbappend"), layer_dir.rglob("*.bb*")
+            ),
+        )
+    )
 
 
 def get_bpns(
-    modified_files: Optional[List[Path]] = None, bpn_filter: BPNFilter = BPNFilter.ALL
-) -> List[str]:
+    modified_files: list[Path] | None = None, bpn_filter: BPNFilter = BPNFilter.ALL
+) -> list[str]:
     """Either gets a list of all the BPNs in the layer, or just the BPNs that are associated with modified files.
 
     Args:
