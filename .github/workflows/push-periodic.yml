@@ -31,7 +31,6 @@ jobs:
     with:
       branch: ${{ github.ref_name }}
       only-build-modified: false
-      parse-only: false
       run-tests: ${{ github.event_name == 'schedule' }}
       runner: yocto_build_host
       save-cache: true

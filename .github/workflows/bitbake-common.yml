@@ -21,10 +21,6 @@ on:  # yamllint disable-line rule:truthy
         description: 'If true, bitbake will only build the recipes that are affected by the PR'
         required: true
         type: boolean
-      parse-only:
-        description: 'If true, bitbake only parses and does not build'
-        required: true
-        type: boolean
       runner:
         description: 'The runner to execute this workfow with'
         required: true
@@ -163,12 +159,7 @@ jobs:
           echo "## $AUTO_CONF configuration ##"
           cat "$AUTO_CONF"
 
-          # Run bitbake
-          extra_args=""
-          if [ "${{ inputs.parse-only }}" = "true" ]; then
-            extra_args="--parse-only"
-          fi
-          bitbake $extra_args ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
+          bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
 
       - name: Enable KVM group perms
         if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
