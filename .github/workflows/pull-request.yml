@@ -12,23 +12,20 @@ jobs:
   lint:
     uses: ./.github/workflows/lint-common.yml
 
-  parse:
-    name: 'Parse recipes'
+  check-layer:
+    name: 'Check meta-lts-collab layer'
     needs: lint
-    uses: ./.github/workflows/bitbake-common.yml
+    uses: ./.github/workflows/yocto-check-layer.yml
     with:
       branch: ${{ github.base_ref }}
-      only-build-modified: false
-      parse-only: true
       runner: ubuntu-22.04
-      use-cache: false
 
   build:
     name: 'Build and test recipes (Systemd: ${{ matrix.systemd }})'
     strategy:
       matrix:
         systemd: [true, false]
-    needs: parse
+    needs: check-layer
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.base_ref }}

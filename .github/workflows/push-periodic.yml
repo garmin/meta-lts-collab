@@ -14,21 +14,19 @@ jobs:
   lint:
     uses: ./.github/workflows/lint-common.yml
 
-  parse:
+  check-layer:
+    name: 'Check meta-lts-collab layer'
     needs: lint
-    uses: ./.github/workflows/bitbake-common.yml
+    uses: ./.github/workflows/yocto-check-layer.yml
     with:
-      branch: ${{ github.ref_name }}
-      only-build-modified: false
-      parse-only: true
+      branch: ${{ github.base_ref }}
       runner: ubuntu-22.04
-      use-cache: false
 
   build:
     strategy:
       matrix:
         systemd: [true, false]
-    needs: parse
+    needs: check-layer
     uses: ./.github/workflows/bitbake-common.yml
     with:
       branch: ${{ github.ref_name }}
