@@ -1,0 +1,53 @@
+From 0717fccb890537d0fb471d966e7fec38bee964b7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jo=C3=A3o=20Marcos=20Costa?= <joaomarcos.costa@bootlin.com>
+Date: Fri, 31 Jul 2026 11:11:53 +0200
+Subject: [PATCH] curl: increase test timeouts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We often see multiple curl tests fail during ptest runs, the actual test
+varies but the output is like this:
+
+  FAIL: 337: protoc!
+  There was no content at all in the file log/3/server.input.
+  Server glitch? Total curl failure? Returned: 28
+
+Error code 28 is CURLE_OPERATION_TIMEDOUT, so this is almost certainly
+due to a loaded machine resulting in the tests running slowly.
+
+It is notable that the test runner explicitly passes --max-time=13 to
+curl, so experiment and change this to 600 to see if this solves the
+problem.
+
+[ YOCTO #15268 ]
+
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+[JM: needed to adapt the patch to kirkstone, as server_response_maxtime
+was defined elsewhere. I also used the oe-core commit (e2e9ec1bf97a)
+message instead of curl's patch one, since it provides more context]
+
+Upstream-Status: Backport [https://github.com/openembedded/openembedded-core/commits/master/meta/recipes-support/curl/curl/no-test-timeout.patch]
+Signed-off-by: João Marcos Costa <joaomarcos.costa@bootlin.com>
+---
+ tests/runtests.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/runtests.pl b/tests/runtests.pl
+index 72a99892f0..19f0b9762b 100755
+--- a/tests/runtests.pl
++++ b/tests/runtests.pl
+@@ -204,7 +204,7 @@ my $TESTCASES="all";
+ 
+ # invoke perl like this:
+ my $perl="perl -I$srcdir";
+-my $server_response_maxtime=13;
++my $server_response_maxtime=600;
+ 
+ my $debug_build=0;          # built debug enabled (--enable-debug)
+ my $has_memory_tracking=0;  # built with memory tracking (--enable-curldebug)
+-- 
+2.47.0
+
