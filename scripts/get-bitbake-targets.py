@@ -9,6 +9,11 @@ NATIVE_ONLY_BPNS = {
     line.strip() for line in NATIVE_ONLY_FILE.read_text().splitlines() if line.strip()
 }
 
+BUILD_ALIAS_FILE = Path(__file__).resolve().parent / "build-aliases.csv"
+BUILD_ALIASES = {
+    k: v for k, v in [x.split(",") for x in BUILD_ALIAS_FILE.read_text().splitlines()]
+}
+
 
 class BPNFilter(Enum):
     ALL = "all"
@@ -97,22 +102,22 @@ def get_bpns(
         List[str]: All BPNs in the layer, or all associated BPNs if modified files are provided
     """
     bpns = get_modified_bpns(modified_files) if modified_files else get_all_bpns()
-    
+
     bpns = list(set(bpns))  # Remove duplicates
     bpns = list(filter(lambda bpn: bpn != "systemd", bpns))
     bpns = list(filter(lambda bpn: not bpn.startswith("linux-yocto"), bpns))
 
     if bpn_filter == BPNFilter.NATIVE:
-        return list(
+        bpns = list(
             filter(lambda bpn: bpn.removesuffix("-native") in NATIVE_ONLY_BPNS, bpns)
         )
     elif bpn_filter == BPNFilter.IMAGE:
-        return list(
+        bpns = list(
             filter(
                 lambda bpn: bpn.removesuffix("-native") not in NATIVE_ONLY_BPNS, bpns
             )
         )
-    return bpns
+    return sorted([BUILD_ALIASES.get(x, x) for x in bpns])
 
 
 def main() -> None:
