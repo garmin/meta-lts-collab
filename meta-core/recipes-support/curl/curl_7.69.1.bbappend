@@ -8,6 +8,14 @@ SRC_URI_append = " \
     file://CVE-2025-15079.patch \
     file://CVE-2025-15224.patch \
     file://CVE-2025-14017.patch \
+    file://CVE-2026-1965-1.patch \
+    file://CVE-2026-1965-2.patch \
+    file://CVE-2026-3783-pre1.patch \
+    file://CVE-2026-3783.patch \
+    file://CVE-2026-3784.patch \
+    file://CVE-2026-8927.patch \
+    file://CVE-2026-5773.patch \
+    file://CVE-2026-7168.patch \
     "
 
 # The use-after-free in question doesn't appear until 7.81.0, therefore we can
