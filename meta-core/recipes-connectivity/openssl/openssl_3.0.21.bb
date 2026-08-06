@@ -12,6 +12,7 @@ SRC_URI = "https://github.com/openssl/openssl/releases/download/openssl-${PV}/op
            file://0001-buildinfo-strip-sysroot-and-debug-prefix-map-from-co.patch \
            file://afalg.patch \
            file://0001-Configure-do-not-tweak-mips-cflags.patch \
+		   file://0001-Don-t-raise-NOT_ENOUGH_DATA-on-a-clean-EOF-at-an-obj.patch \
           "
 
 SRC_URI:append:class-nativesdk = " \
