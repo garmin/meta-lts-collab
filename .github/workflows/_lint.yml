@@ -1,12 +1,13 @@
 ---
-name: Lint Common Steps
+# Reusable workflow: run ruff, yamllint, and oelint-adv against the repo.
+name: '[Reusable] Lint'
 on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
       runner:
-        default: ubuntu-22.04
-        description: 'The runner to execute this workfow with'
+        description: 'The runner to execute this workflow on'
         required: false
+        default: ubuntu-22.04
         type: string
 
 permissions:
@@ -14,10 +15,11 @@ permissions:
 
 jobs:
   lint:
-    name: 'Lint scripts & CI'
+    name: Lint
     runs-on: ${{ inputs.runner }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Checkout repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
@@ -30,11 +32,11 @@ jobs:
       - name: Run ruff check on scripts
         run: ruff check scripts
 
-      - name: Run ruff format on scripts
-        run: ruff format scripts/
+      - name: Run ruff format --check on scripts
+        run: ruff format --check scripts/
 
       - name: Run yamllint on workflows
-        run: yamllint .github/workflows/
+        run: yamllint .github/
 
       - name: Run oelint-adv
         run: oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')

@@ -1,0 +1,113 @@
+---
+# Reusable workflow: bitbake an image plus native targets, optionally run testimage.
+name: '[Reusable] Bitbake'
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      branch:
+        description: 'The Yocto branch (Version) to build'
+        required: true
+        type: string
+      runner:
+        description: 'The runner to execute this workflow on'
+        required: true
+        type: string
+      target-image:
+        description: 'The image that is intended to be built'
+        required: false
+        default: 'core-image-minimal'
+        type: string
+      use-systemd:
+        description: 'If "true", enable systemd + usrmerge'
+        required: false
+        default: false
+        type: boolean
+      only-build-modified:
+        description: 'If "true", build only recipes affected by the PR'
+        required: true
+        type: boolean
+      run-tests:
+        description: 'If "true", run testimage after the build'
+        required: false
+        default: false
+        type: boolean
+      use-cache:
+        description: 'If "true", restore downloads and sstate before the build'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  bitbake:
+    name: Build
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: ./.github/actions/setup-build-env
+        with:
+          branch: ${{ inputs.branch }}
+          build-dir: ${{ github.workspace }}
+
+      - uses: ./.github/actions/get-bitbake-targets
+        id: targets
+        with:
+          only-build-modified: ${{ inputs.only-build-modified }}
+          build-dir: ${{ github.workspace }}
+
+      - uses: ./.github/actions/write-file
+        if: ${{ inputs.use-systemd }}
+        with:
+          content: |
+            DISTRO_FEATURES:append = " systemd usrmerge"
+            DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+            VIRTUAL-RUNTIME_init_manager = "systemd"
+            VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
+          path: ${{ github.workspace }}/build/conf/auto.conf
+          append: 'true'
+
+      - name: Restore downloads and sstate
+        if: ${{ inputs.use-cache && steps.targets.outputs.all_build_targets != '' }}
+        uses: ./.github/actions/restore-build-cache
+        with:
+          branch: ${{ inputs.branch }}
+          build-dir: ${{ github.workspace }}
+          systemd: ${{ inputs.use-systemd }}
+
+      - name: bitbake ${{ inputs.target-image }}
+        if: ${{ steps.targets.outputs.all_build_targets != '' }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          source poky/oe-init-build-env
+          bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
+
+      - name: Enable KVM permissions
+        if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | \
+            sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: bitbake testimage
+        if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          source poky/oe-init-build-env
+          bitbake -c testimage ${{ inputs.target-image }}
+
+      - name: Save downloads and sstate
+        if: ${{ always() && steps.targets.outputs.all_build_targets != '' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: |
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
+          key:
+            "downloads-and-sstate-${{ inputs.branch }}-\
+            ${{ inputs.use-systemd && 'systemd' || 'sysvinit' }}-\
+            ${{ github.run_id }}-${{ github.run_attempt }}"
