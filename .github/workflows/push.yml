@@ -1,0 +1,36 @@
+---
+name: Push
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["dunfell"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.github/workflows/_lint.yml
+
+  check-layer:
+    name: Check layer
+    needs: lint
+    uses: ./.github/workflows/_yocto-check-layer.yml
+    with:
+      branch: ${{ github.ref_name }}
+      runner: ubuntu-22.04
+
+  build:
+    name: 'Build (systemd=${{ matrix.systemd }})'
+    needs: check-layer
+    strategy:
+      matrix:
+        systemd: [true, false]
+    uses: ./.github/workflows/_bitbake.yml
+    with:
+      branch: ${{ github.ref_name }}
+      runner: yocto_build_host
+      only-build-modified: false
+      run-tests: false
+      use-cache: true
+      use-systemd: ${{ matrix.systemd }}

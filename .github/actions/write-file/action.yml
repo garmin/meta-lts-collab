@@ -1,0 +1,30 @@
+---
+name: Write file
+description: Writes multiline content to a file, optionally appending
+inputs:
+  content:
+    description: 'The (possibly multiline) content to write'
+    required: true
+  path:
+    description: 'The file path to write the content to'
+    required: true
+  append:
+    description: 'If true, append to the file. If false, overwrite/clear it first.'
+    required: false
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - name: Write content to file
+      shell: bash
+      env:
+        CONTENT: ${{ inputs.content }}
+        FILE_PATH: ${{ inputs.path }}
+        APPEND: ${{ inputs.append }}
+      run: |
+        mkdir -p "$(dirname "$FILE_PATH")"
+        if [ "$APPEND" = "true" ]; then
+          printf '%s\n' "$CONTENT" >> "$FILE_PATH"
+        else
+          printf '%s\n' "$CONTENT" > "$FILE_PATH"
+        fi

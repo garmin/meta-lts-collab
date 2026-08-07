@@ -1,0 +1,41 @@
+---
+# Reusable workflow: validate meta-lts-collab with yocto-check-layer.
+name: '[Reusable] Yocto Check Layer'
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      branch:
+        description: 'The Yocto branch to run yocto-check-layer against'
+        required: true
+        type: string
+      runner:
+        description: 'The runner to execute this workflow on'
+        required: false
+        default: ubuntu-22.04
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  yocto-check-layer:
+    name: Check layer
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: ./.github/actions/setup-build-env
+        with:
+          branch: ${{ inputs.branch }}
+          build-dir: ${{ github.workspace }}
+          bblayers-add-lts-collab: false
+
+      - name: Run yocto-check-layer
+        working-directory: ${{ github.workspace }}
+        run: |
+          source poky/oe-init-build-env
+          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
+          yocto-check-layer \
+            --without-software-layer-signature-check \
+            "$GITHUB_WORKSPACE/meta-lts-collab"

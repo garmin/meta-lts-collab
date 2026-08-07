@@ -1,0 +1,74 @@
+---
+name: Setup build environment
+description: >-
+  Clones sources, installs host deps, and initializes the build tree.
+inputs:
+  branch:
+    description: 'The Yocto branch (Version) to build'
+    required: true
+  build-dir:
+    description: 'Absolute dir containing poky/, meta-oe/, meta-lts-collab/, build/'
+    required: false
+    default: ${{ github.workspace }}
+  meta-lts-collab-ref:
+    description: 'Reference of meta-lts-collab to use'
+    required: false
+    default: ''
+  bblayers-add-lts-collab:
+    description: 'Add meta-lts-collab to bblayers.conf'
+    required: false
+    default: true
+runs:
+  using: composite
+  steps:
+    - name: Install host dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gawk wget git-core diffstat unzip texinfo gcc-multilib \
+          build-essential chrpath socat cpio python3 python3-pip \
+          python3-pexpect xz-utils debianutils iputils-ping python3-git \
+          python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
+          python3-subunit mesa-common-dev
+
+    - name: Clone meta-lts-collab
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        ref: ${{ inputs.meta-lts-collab-ref }}
+        path: ${{ inputs.build-dir }}/meta-lts-collab
+
+    - name: Clone poky
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        repository: yoctoproject/poky
+        ref: ${{ inputs.branch }}
+        path: ${{ inputs.build-dir }}/poky
+
+    - name: Clone meta-openembedded
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        repository: openembedded/meta-openembedded
+        ref: ${{ inputs.branch }}
+        path: ${{ inputs.build-dir }}/meta-oe
+
+    - name: Install buildtools
+      shell: bash
+      working-directory: ${{ inputs.build-dir }}
+      run: |
+        $GITHUB_WORKSPACE/poky/scripts/install-buildtools \
+          -u https://downloads.yoctoproject.org/releases/yocto/yocto-3.1.33/buildtools/ \
+          --without-extended-buildtools \
+          -d $GITHUB_WORKSPACE/buildtools
+
+    - name: Initialize build directory
+      shell: bash
+      working-directory: ${{ inputs.build-dir }}
+      env:
+        BBLAYERS_ADD_LTS_COLLAB: ${{ inputs.bblayers-add-lts-collab }}
+      run: |
+        source poky/oe-init-build-env
+        bitbake-layers add-layer "${{ inputs.build-dir }}"/meta-oe/meta-*
+        if [ "$BBLAYERS_ADD_LTS_COLLAB" = "true" ]; then
+          bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab"
+        fi
