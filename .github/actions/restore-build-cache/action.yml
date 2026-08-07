@@ -1,0 +1,29 @@
+---
+name: Restore build cache
+description: Restores downloads and sstate cache for the configured branch/build directory
+inputs:
+  branch:
+    description: 'The Yocto branch used for cache key namespace'
+    required: true
+  build-dir:
+    description: 'Absolute dir containing build/downloads and build/sstate-cache'
+    required: false
+    default: ${{ github.workspace }}
+  systemd:
+    description: 'Whether or not Systemd is used for the given build'
+    required: false
+    default: false
+runs:
+  using: composite
+  steps:
+    - name: Restore downloads and sstate
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+      with:
+        path: |
+          ${{ inputs.build-dir }}/build/downloads
+          ${{ inputs.build-dir }}/build/sstate-cache
+        key: ${{ format('downloads-and-sstate-{0}-{1}-{2}-{3}-', inputs.branch, inputs.systemd == 'true' && 'systemd' || 'sysvinit', github.run_id, github.run_attempt) }}
+        restore-keys: |
+          ${{ format('downloads-and-sstate-{0}-{1}-{2}-', inputs.branch, inputs.systemd == 'true' && 'systemd' || 'sysvinit', github.run_id) }}
+          ${{ format('downloads-and-sstate-{0}-{1}-', inputs.branch, inputs.systemd == 'true' && 'systemd' || 'sysvinit') }}
+          ${{ format('downloads-and-sstate-{0}-', inputs.branch) }}

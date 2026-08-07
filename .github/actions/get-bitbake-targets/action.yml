@@ -1,0 +1,66 @@
+---
+name: Get BitBake targets
+description: >-
+  Computes native/image bitbake targets (optionally scoped to modified
+  files) and writes them into build/conf/auto.conf.
+inputs:
+  only-build-modified:
+    description: 'If "true", limit targets to recipes affected by the PR'
+    required: true
+  build-dir:
+    description: 'Absolute build directory (must contain meta-lts-collab/ and build/)'
+    required: false
+    default: ${{ github.workspace }}
+outputs:
+  all_build_targets:
+    description: 'All build targets (native and image) that will be built'
+    value: ${{ steps.targets.outputs.all_build_targets }}
+  image_targets:
+    description: 'All image targets that will be built'
+    value: ${{ steps.targets.outputs.image_targets }}
+  native_targets:
+    description: 'All native targets that will be built'
+    value: ${{ steps.targets.outputs.native_targets }}
+runs:
+  using: composite
+  steps:
+    - name: Get changed files
+      id: changed-files
+      if: ${{ inputs.only-build-modified == 'true' }}
+      uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96  # v47.0.6
+
+    - name: Compute build targets
+      id: targets
+      shell: bash
+      working-directory: ${{ inputs.build-dir }}/meta-lts-collab
+      env:
+        ONLY_MODIFIED: ${{ inputs.only-build-modified }}
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      run: |
+        if [ "$ONLY_MODIFIED" = "true" ]; then
+          args="$CHANGED_FILES"
+        else
+          args=""
+        fi
+        NATIVE_TARGETS=$(./scripts/get-bitbake-targets.py --native ${args})
+        IMAGE_TARGETS=$(./scripts/get-bitbake-targets.py --image ${args})
+        if [ -n "$NATIVE_TARGETS" ] && [ -n "$IMAGE_TARGETS" ]; then
+          ALL_BUILD_TARGETS="$NATIVE_TARGETS $IMAGE_TARGETS"
+        elif [ -n "$NATIVE_TARGETS" ]; then
+          ALL_BUILD_TARGETS="$NATIVE_TARGETS"
+        else
+          ALL_BUILD_TARGETS="$IMAGE_TARGETS"
+        fi
+        {
+          echo "native_targets=$NATIVE_TARGETS"
+          echo "image_targets=$IMAGE_TARGETS"
+          echo "all_build_targets=$ALL_BUILD_TARGETS"
+        } >> "$GITHUB_OUTPUT"
+
+    - uses: ./.github/actions/write-file
+      with:
+        content: |
+          require ${{ inputs.build-dir }}/meta-lts-collab/conf/ci.conf
+          CORE_IMAGE_EXTRA_INSTALL = "${{ steps.targets.outputs.image_targets }}"
+        path: ${{ inputs.build-dir }}/build/conf/auto.conf
+        append: 'true'
