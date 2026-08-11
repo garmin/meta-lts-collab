@@ -17,3 +17,7 @@ SRC_URI:append = " \
     file://CVE-2026-60001.patch \
     file://CVE-2026-60000.patch \
     "
+
+# https://nvd.nist.gov/vuln/detail/CVE-2026-3497
+# not-applicable-platform: Only affects GSSAPI Key Exchange patches used by some Linux distributions and does not exist in upstream openssh.
+CVE_CHECK_IGNORE += "CVE-2026-3497"
