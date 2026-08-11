@@ -21,3 +21,8 @@ SRC_URI:append = " \
 # https://nvd.nist.gov/vuln/detail/CVE-2026-3497
 # not-applicable-platform: Only affects GSSAPI Key Exchange patches used by some Linux distributions and does not exist in upstream openssh.
 CVE_CHECK_IGNORE += "CVE-2026-3497"
+
+# https://nvd.nist.gov/vuln/detail/CVE-2026-59998
+# Only relevant when Kerberos support is disabled.
+# not-applicable-config: GSSAPI/Kerberos support is disabled in the default OpenSSH configuration
+CVE_CHECK_IGNORE += "${@bb.utils.contains('PACKAGECONFIG', 'kerberos', '', 'CVE-2026-59998', d)}"
