@@ -30,3 +30,9 @@ CVE_CHECK_WHITELIST += "CVE-2026-3497"
 # Only relevant when Kerberos support is disabled.
 # not-applicable-config: GSSAPI/Kerberos support is disabled in the default OpenSSH configuration
 CVE_CHECK_WHITELIST += "${@bb.utils.contains('PACKAGECONFIG', 'kerberos', '', 'CVE-2026-59998', d)}"
+
+# https://nvd.nist.gov/vuln/detail/CVE-2026-59996
+# The affected function does not exist in OpenSSH 8.2p1
+# Debian treats this CVE as minor and does not provide fixes.
+# https://security-tracker.debian.org/tracker/CVE-2026-59996
+CVE_CHECK_WHITELIST += "CVE-2026-59996"
