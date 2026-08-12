@@ -36,3 +36,9 @@ CVE_CHECK_WHITELIST += "${@bb.utils.contains('PACKAGECONFIG', 'kerberos', '', 'C
 # Debian treats this CVE as minor and does not provide fixes.
 # https://security-tracker.debian.org/tracker/CVE-2026-59996
 CVE_CHECK_WHITELIST += "CVE-2026-59996"
+
+# https://nvd.nist.gov/vuln/detail/CVE-2026-60002
+# The affected code is quite different in OpenSSH 8.2p1 and the upstream fix is not applicable.
+# Debian treats this CVE as minor and does not provide fixes.
+# https://security-tracker.debian.org/tracker/CVE-2026-60002
+CVE_CHECK_WHITELIST += "CVE-2026-60002"
