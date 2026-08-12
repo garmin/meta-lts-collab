@@ -12,6 +12,7 @@ SRC_URI_append = " \
     file://CVE-2026-35414.patch \
     file://CVE-2026-59999.patch \
     file://CVE-2026-59997.patch \
+    file://CVE-2026-59995.patch \
     "
 
 # Upstream does not consider CVE-2023-51767 a bug underlying in OpenSSH and
