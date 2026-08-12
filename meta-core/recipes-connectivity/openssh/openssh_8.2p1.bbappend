@@ -21,3 +21,7 @@ SRC_URI_append = " \
 # does not intent to address it in OpenSSH
 # https://security-tracker.debian.org/tracker/CVE-2023-51767
 CVE_CHECK_WHITELIST += "CVE-2023-51767"
+
+# https://nvd.nist.gov/vuln/detail/CVE-2026-3497
+# not-applicable-platform: Only affects GSSAPI Key Exchange patches used by some Linux distributions and does not exist in upstream openssh.
+CVE_CHECK_WHITELIST += "CVE-2026-3497"
