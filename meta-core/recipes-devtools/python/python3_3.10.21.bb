@@ -6,6 +6,7 @@ SECTION = "devel/python"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fcf6b249c2641540219a727f35d8d2c2"
 
+# nooelint: oelint.file.patchsignedoff oelint.ltscollab.upstreamstatus oelint.file.inappropriatemsg
 SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://run-ptest \
            file://create_manifest3.py \
@@ -39,13 +40,14 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://0001-gh-107811-tarfile-treat-overflow-in-UID-GID-as-failu.patch \
            "
 
+# nooelint: oelint.file.inappropriatemsg
 SRC_URI:append:class-native = " \
            file://0001-Lib-sysconfig.py-use-prefix-value-from-build-configu.patch \
            file://0001-distutils-sysconfig-append-STAGING_LIBDIR-python-sys.patch \
            file://12-distutils-prefix-is-inside-staging-area.patch \
            file://0001-Don-t-search-system-for-headers-libraries.patch \
            "
-SRC_URI[sha256sum] = "de6517421601e39a9a3bc3e1bc4c7b2f239297423ee05e282598c83ec0647505"
+SRC_URI[sha256sum] = "a0da1e72132e950154eca0f6f47d5db828454700de20e5113667940d81e0db04"
 
 # exclude pre-releases for both python 2.x and 3.x
 UPSTREAM_CHECK_REGEX = "[Pp]ython-(?P<pver>\d+(\.\d+)+).tar"
@@ -81,15 +83,14 @@ ALTERNATIVE:${PN}-dev = "python3-config"
 ALTERNATIVE_LINK_NAME[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config"
 ALTERNATIVE_TARGET[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config-${MULTILIB_SUFFIX}"
 
-
-DEPENDS = "bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux-libuuid libtirpc libnsl2 autoconf-archive-native ncurses"
+DEPENDS:append = " bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux-libuuid libtirpc libnsl2 autoconf-archive-native ncurses"
 DEPENDS:append:class-target = " python3-native"
 DEPENDS:append:class-nativesdk = " python3-native"
 
 # force to use the mutex+cond implementation (https://bugs.python.org/issue41710)
 CFLAGS += "-DHAVE_BROKEN_POSIX_SEMAPHORES"
 
-EXTRA_OECONF = " --without-ensurepip --enable-shared --with-platlibdir=${baselib}"
+EXTRA_OECONF = "--without-ensurepip --enable-shared --with-platlibdir=${baselib}"
 EXTRA_OECONF:append:class-native = " --bindir=${bindir}/${PN}"
 
 export CROSSPYTHONPATH="${STAGING_LIBDIR_NATIVE}/python${PYTHON_MAJMIN}/lib-dynload/"
@@ -99,7 +100,7 @@ EXTRANATIVEPATH += "python3-native"
 # LTO will be enabled via packageconfig depending upong distro features
 LTO:class-target = ""
 
-CACHED_CONFIGUREVARS = " \
+CACHED_CONFIGUREVARS = "\
                 ac_cv_file__dev_ptmx=yes \
                 ac_cv_file__dev_ptc=no \
                 ac_cv_working_tzset=yes \
@@ -226,7 +227,7 @@ do_install:append:class-nativesdk () {
 }
 
 SSTATE_SCAN_FILES += "Makefile _sysconfigdata.py"
-SSTATE_HASHEQUIV_FILEMAP = " \
+SSTATE_HASHEQUIV_FILEMAP = "\
     populate_sysroot:*/lib*/python3*/_sysconfigdata*.py:${TMPDIR} \
     populate_sysroot:*/lib*/python3*/_sysconfigdata*.py:${COREBASE} \
     populate_sysroot:*/lib*/python3*/config-*/Makefile:${TMPDIR} \
@@ -393,11 +394,14 @@ RPROVIDES:${PN}-venv += "${MLPREFIX}python3-pyvenv"
 PACKAGES =+ "libpython3 libpython3-staticdev"
 FILES:libpython3 = "${libdir}/libpython*.so.*"
 FILES:libpython3-staticdev += "${libdir}/python${PYTHON_MAJMIN}/config-${PYTHON_MAJMIN}-*/libpython${PYTHON_MAJMIN}.a"
+# nooelint: oelint.vars.insaneskip
 INSANE_SKIP:${PN}-dev += "dev-elf"
+# nooelint: oelint.vars.insaneskip
 INSANE_SKIP:${PN}-ptest = "dev-deps"
 
 # catch all the rest (unsorted)
 PACKAGES += "${PN}-misc"
+# nooelint: oelint.vars.dependsordered
 RDEPENDS:${PN}-misc += "\
   ${PN}-core \
   ${PN}-email \
@@ -418,9 +422,11 @@ FILES:${PN}-man = "${datadir}/man"
 # See https://bugs.python.org/issue18748 and https://bugs.python.org/issue37395
 RDEPENDS:libpython3:append:libc-glibc = " libgcc"
 RDEPENDS:${PN}-ctypes:append:libc-glibc = " ${MLPREFIX}ldconfig"
+# nooelint: oelint.vars.dependsordered
 RDEPENDS:${PN}-ptest = "${PN}-modules ${PN}-tests ${PN}-dev unzip bzip2 libgcc tzdata-europe coreutils sed"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " locale-base-tr-tr.iso-8859-9"
 RDEPENDS:${PN}-tkinter += "${@bb.utils.contains('PACKAGECONFIG', 'tk', '${MLPREFIX}tk ${MLPREFIX}tk-lib', '', d)}"
+# nooelint: oelint.vars.dependsordered
 RDEPENDS:${PN}-idle += "${@bb.utils.contains('PACKAGECONFIG', 'tk', '${PN}-tkinter ${MLPREFIX}tcl', '', d)}"
 RDEPENDS:${PN}-dev = ""
 RDEPENDS:${PN}-pydoc += "${PN}-io"
@@ -429,7 +435,7 @@ RDEPENDS:${PN}-tests:append:class-target = " ${MLPREFIX}bash"
 RDEPENDS:${PN}-tests:append:class-nativesdk = " ${MLPREFIX}bash"
 
 # Python's tests contain large numbers of files we don't need in the recipe sysroots
-SYSROOT_PREPROCESS_FUNCS += " py3_sysroot_cleanup"
+SYSROOT_PREPROCESS_FUNCS += "py3_sysroot_cleanup"
 py3_sysroot_cleanup () {
 	rm -rf ${SYSROOT_DESTDIR}${libdir}/python${PYTHON_MAJMIN}/test
 }
