@@ -44,6 +44,9 @@ jobs:
   bitbake:
     name: Build
     runs-on: ${{ inputs.runner }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -82,8 +85,8 @@ jobs:
         if: ${{ steps.targets.outputs.all_build_targets != '' }}
         working-directory: ${{ github.workspace }}
         run: |
+          . buildtools/environment-setup-x86_64-pokysdk-linux
           source poky/oe-init-build-env
-          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
           bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
 
       - name: Enable KVM permissions
@@ -99,7 +102,6 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           source poky/oe-init-build-env
-          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
           bitbake -c testimage ${{ inputs.target-image }}
 
       - name: Save downloads and sstate

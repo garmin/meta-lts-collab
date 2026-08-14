@@ -35,7 +35,6 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           source poky/oe-init-build-env
-          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
           yocto-check-layer \
             --without-software-layer-signature-check \
             "$GITHUB_WORKSPACE/meta-lts-collab"
