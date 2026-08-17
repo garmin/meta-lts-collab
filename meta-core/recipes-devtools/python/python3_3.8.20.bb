@@ -6,6 +6,7 @@ SECTION = "devel/python"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=07fc4b9a9c0c0e48050ed38a5e72552b"
 
+# nooelint: oelint.ltscollab.upstreamstatus oelint.file.inappropriatemsg
 SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://run-ptest \
            file://create_manifest3.py \
@@ -37,6 +38,7 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://CVE-2023-24329.patch \
            "
 
+# nooelint: oelint.file.patchsignedoff
 SRC_URI_append_class-native = " \
            file://0001-distutils-sysconfig-append-STAGING_LIBDIR-python-sys.patch \
            file://12-distutils-prefix-is-inside-staging-area.patch \
@@ -54,7 +56,6 @@ SRC_URI_append = " \
     file://CVE-2025-13836.patch \
 "
 
-SRC_URI[md5sum] = "745478c81d6382cf46b5e7ad89e56008"
 SRC_URI[sha256sum] = "6fb89a7124201c61125c0ab4cf7f6894df339a40c02833bfd28ab4d7691fafb4"
 
 # exclude pre-releases for both python 2.x and 3.x
@@ -89,19 +90,18 @@ ALTERNATIVE_${PN}-dev = "python3-config"
 ALTERNATIVE_LINK_NAME[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config"
 ALTERNATIVE_TARGET[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config-${MULTILIB_SUFFIX}"
 
-
-DEPENDS = "bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux libtirpc libnsl2 autoconf-archive"
+DEPENDS_append = " bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux libtirpc libnsl2 autoconf-archive"
 DEPENDS_append_class-target = " python3-native"
 DEPENDS_append_class-nativesdk = " python3-native"
 
-EXTRA_OECONF = " --without-ensurepip --enable-shared"
+EXTRA_OECONF = "--without-ensurepip --enable-shared"
 EXTRA_OECONF_append_class-native = " --bindir=${bindir}/${PN}"
 
 export CROSSPYTHONPATH="${STAGING_LIBDIR_NATIVE}/python${PYTHON_MAJMIN}/lib-dynload/"
 
 EXTRANATIVEPATH += "python3-native"
 
-CACHED_CONFIGUREVARS = " \
+CACHED_CONFIGUREVARS = "\
                 ac_cv_file__dev_ptmx=yes \
                 ac_cv_file__dev_ptc=no \
                 ac_cv_working_tzset=yes \
@@ -224,7 +224,7 @@ py_package_preprocess () {
         cd -
 
         mv ${PKGD}/${bindir}/python${PYTHON_MAJMIN}-config ${PKGD}/${bindir}/python${PYTHON_MAJMIN}-config-${MULTILIB_SUFFIX}
-        
+
         #Remove the unneeded copy of target sysconfig data
         rm -rf ${PKGD}/${libdir}/python-sysconfigdata
 }
@@ -348,11 +348,14 @@ RPROVIDES_${PN}-venv += "python3-pyvenv"
 PACKAGES =+ "libpython3 libpython3-staticdev"
 FILES_libpython3 = "${libdir}/libpython*.so.*"
 FILES_libpython3-staticdev += "${libdir}/python${PYTHON_MAJMIN}/config-${PYTHON_MAJMIN}-*/libpython${PYTHON_MAJMIN}.a"
+# nooelint: oelint.vars.insaneskip
 INSANE_SKIP_${PN}-dev += "dev-elf"
+# nooelint: oelint.vars.insaneskip
 INSANE_SKIP_${PN}-ptest += "dev-deps"
 
 # catch all the rest (unsorted)
 PACKAGES += "${PN}-misc"
+# nooelint: oelint.vars.dependsordered
 RDEPENDS_${PN}-misc += "python3-core python3-email python3-codecs python3-pydoc python3-pickle python3-audio"
 RDEPENDS_${PN}-modules_append_class-target = " python3-misc"
 RDEPENDS_${PN}-modules_append_class-nativesdk = " python3-misc"
@@ -365,6 +368,7 @@ FILES_${PN}-man = "${datadir}/man"
 # See https://bugs.python.org/issue18748 and https://bugs.python.org/issue37395
 RDEPENDS_libpython3_append_libc-glibc = " libgcc"
 RDEPENDS_${PN}-ctypes_append_libc-glibc = " ${MLPREFIX}ldconfig"
+# nooelint: oelint.vars.dependsordered
 RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-tests ${PN}-dev unzip bzip2 libgcc tzdata-europe coreutils sed"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-tr-tr.iso-8859-9"
 RDEPENDS_${PN}-tkinter += "${@bb.utils.contains('PACKAGECONFIG', 'tk', 'tk tk-lib', '', d)}"
@@ -374,7 +378,7 @@ RDEPENDS_${PN}-tests_append_class-target = " bash"
 RDEPENDS_${PN}-tests_append_class-nativesdk = " bash"
 
 # Python's tests contain large numbers of files we don't need in the recipe sysroots
-SYSROOT_PREPROCESS_FUNCS += " py3_sysroot_cleanup"
+SYSROOT_PREPROCESS_FUNCS += "py3_sysroot_cleanup"
 py3_sysroot_cleanup () {
 	rm -rf ${SYSROOT_DESTDIR}${libdir}/python${PYTHON_MAJMIN}/test
 }
