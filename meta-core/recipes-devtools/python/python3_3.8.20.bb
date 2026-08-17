@@ -43,13 +43,24 @@ SRC_URI_append_class-native = " \
            file://0001-Don-t-search-system-for-headers-libraries.patch \
            "
 
+# This patch exists upstream but has been removed from SRC_URI.
+# It's required for ptests to pass.
+SRC_URI_append = " \
+    file://0001-test_ctypes.test_find-skip-without-tools-sdk.patch \
+"
+
+SRC_URI_append = " \
+    file://CVE-2024-9287.patch \
+    file://CVE-2025-13836.patch \
+"
+
 SRC_URI[md5sum] = "745478c81d6382cf46b5e7ad89e56008"
 SRC_URI[sha256sum] = "6fb89a7124201c61125c0ab4cf7f6894df339a40c02833bfd28ab4d7691fafb4"
 
 # exclude pre-releases for both python 2.x and 3.x
 UPSTREAM_CHECK_REGEX = "[Pp]ython-(?P<pver>\d+(\.\d+)+).tar"
 
-CVE_PRODUCT = "python"
+CVE_PRODUCT = "python:python python_software_foundation:python"
 
 # Upstream consider this expected behaviour
 CVE_CHECK_WHITELIST += "CVE-2007-4559"
