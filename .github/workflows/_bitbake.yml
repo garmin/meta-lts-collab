@@ -82,8 +82,8 @@ jobs:
         if: ${{ steps.targets.outputs.all_build_targets != '' }}
         working-directory: ${{ github.workspace }}
         run: |
+          source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           source poky/oe-init-build-env
-          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
           bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
 
       - name: Enable KVM permissions
@@ -98,8 +98,8 @@ jobs:
         if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
         working-directory: ${{ github.workspace }}
         run: |
+          source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           source poky/oe-init-build-env
-          source $GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux
           bitbake -c testimage ${{ inputs.target-image }}
 
       - name: Save downloads and sstate

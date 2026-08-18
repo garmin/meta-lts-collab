@@ -67,8 +67,15 @@ runs:
       env:
         BBLAYERS_ADD_LTS_COLLAB: ${{ inputs.bblayers-add-lts-collab }}
       run: |
+        rm -rf "${{ inputs.build-dir }}/build/tmp/hosttools"
+        source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
         source poky/oe-init-build-env
         bitbake-layers add-layer "${{ inputs.build-dir }}"/meta-oe/meta-*
         if [ "$BBLAYERS_ADD_LTS_COLLAB" = "true" ]; then
           bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab"
+        fi
+        actual_tar=$(which tar)
+        if [[ "$actual_tar" != *buildtools* ]]; then
+          echo "::error::tar resolves to '$actual_tar', which is not from buildtools"
+          exit 1
         fi
