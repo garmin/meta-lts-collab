@@ -39,11 +39,14 @@ Other repositories may be added as needed using dynamic layers.
 
 ## 3. Maintainer and Contributions
 
-Initial Maintainer: Colin Pinnell McAllister <colin.mcallister@garmin.com>
+Primary Maintainer: Colin Pinnell McAllister <colin.mcallister@garmin.com>
 
-Support from experienced Yocto Project contributors is welcome, especially in the early stages.
+Additional maintainers help review and merge changes; see
+[`.github/CODEOWNERS`](.github/CODEOWNERS) for the current list. Support from experienced Yocto
+Project contributors is welcome.
 
-Contributions should follow the Yocto Project and OpenEmbedded Contributor Guide.
+Contributions should follow the
+[Yocto Project Contributor Guide](https://docs.yoctoproject.org/contributor-guide/index.html).
 
 ## 4. Patch Submission & Review
 
