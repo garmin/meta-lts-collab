@@ -1,0 +1,15 @@
+---
+name: Nightly
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: "0 3 * * * 1-6"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  periodic:
+    uses: ./.github/workflows/_periodic.yml
+    with:
+      target-image: core-image-ptest-fast
