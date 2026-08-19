@@ -171,6 +171,8 @@ Trigger-specific behavior:
 - **Push** (`kirkstone`): build every recipe added or modified by the layer, then run
   `cve-check` against `universe` for both `dunfell` and `kirkstone` and publish the CVE
   summaries to GitHub Pages.
+- **Nightly** (3:00 UTC): same as push, but also run `do_testimage` to run ptests for every
+  recipe added or modified by the layer, along with PTESTS_FAST.
 - **Weekly** (Sundays 03:00 UTC): same as push, but refresh the downloads and sstate cache
   from scratch and also run `do_testimage` to run ptests for every recipe added or modified
   by the layer along with PTESTS_SLOW.
