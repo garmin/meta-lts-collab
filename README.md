@@ -179,7 +179,9 @@ Trigger-specific behavior:
 
 Dependent-recipe breakage (e.g. a meta-core or meta-oe recipe that consumes a modified recipe) is
 not detected — catching it would require a full `bitbake world`, which may be revisited if cache
-sizes grow. See [`.github/workflows`](.github/workflows) for full configuration.
+sizes grow.
+
+See [`.github/workflows`](.github/workflows) for full CI configuration.
 
 ## 8. Terms of Use / Disclaimer
 
