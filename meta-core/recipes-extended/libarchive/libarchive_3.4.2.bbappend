@@ -8,6 +8,7 @@ SRC_URI_append = " \
     file://CVE-2025-5918-0001.patch \
     file://CVE-2025-5918-0002.patch \
     file://CVE-2025-5918-0003.patch \
+    file://CVE-2026-4426_CVE-2026-5121.patch \
     "
 
 # cpe-incorrect:
