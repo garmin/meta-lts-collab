@@ -172,7 +172,8 @@ Trigger-specific behavior:
   `cve-check` against `universe` for both `dunfell` and `kirkstone` and publish the CVE
   summaries to GitHub Pages.
 - **Weekly** (Sundays 03:00 UTC): same as push, but refresh the downloads and sstate cache
-  from scratch and also run `do_testimage`.
+  from scratch and also run `do_testimage` to run ptests for every recipe added or modified
+  by the layer along with PTESTS_SLOW.
 
 Dependent-recipe breakage (e.g. a meta-core or meta-oe recipe that consumes a modified recipe) is
 not detected — catching it would require a full `bitbake world`, which may be revisited if cache
