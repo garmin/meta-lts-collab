@@ -10,5 +10,6 @@ permissions:
 
 jobs:
   periodic:
-    name: Lint
     uses: ./.github/workflows/_periodic.yml
+    with:
+      target-image: core-image-ptest-all
