@@ -2,7 +2,7 @@
 name: Nightly
 on:  # yamllint disable-line rule:truthy
   schedule:
-    - cron: "0 3 * * * 1-6"
+    - cron: "0 3 * * 1-6"
   workflow_dispatch:
 
 permissions:
