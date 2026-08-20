@@ -13,3 +13,4 @@ jobs:
     uses: ./.github/workflows/_periodic.yml
     with:
       target-image: core-image-ptest-all
+      use-cache: false
