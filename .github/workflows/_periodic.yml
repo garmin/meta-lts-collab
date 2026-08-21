@@ -4,6 +4,11 @@ name: '[Reusable] Periodic'
 on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
+      run-tests:
+        description: 'If "true", run testimage after the build'
+        required: false
+        default: true
+        type: boolean
       target-image:
         description: 'The image that is intended to be built'
         required: false
@@ -42,7 +47,7 @@ jobs:
       branch: kirkstone
       runner: yocto_build_host
       only-build-modified: false
-      run-tests: true
+      run-tests: ${{ inputs.run-tests }}
       target-image: ${{ inputs.target-image }}
       use-cache: ${{ inputs.use-cache }}
       use-systemd: ${{ matrix.systemd }}
