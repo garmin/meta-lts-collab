@@ -44,8 +44,53 @@ Additional maintainers help review and merge changes; see
 [`.github/CODEOWNERS`](.github/CODEOWNERS) for the current list. Support from experienced Yocto
 Project contributors is welcome.
 
-Contributions should follow the
-[Yocto Project Contributor Guide](https://docs.yoctoproject.org/contributor-guide/index.html).
+Contributions should follow the [Yocto Project Contributor Guide][yp-contrib].
+
+### Patch file metadata
+
+The subsections below supplement the [Yocto Project Contributor Guide][yp-contrib] with
+meta-lts-collab-specific expectations for patch files added to the layer.
+
+#### Signing off patches
+
+In addition to signing off the commit that adds a new patch file, the author must add
+their own `Signed-off-by:` line inside the patch file.
+
+This applies even when the patch was sourced from a newer Yocto version and already carries
+a `Signed-off-by:` line from its original author. Adding the patch file to meta-lts-collab is
+itself a contribution, so whoever imports it must sign it off to satisfy the
+[Developer Certificate of Origin](https://developercertificate.org/).
+
+#### `Origin:` tag
+
+The `Origin:` tag records where the patch was sourced from, and is required whenever
+the patch was not taken directly from the upstream project's own fix commit. For example,
+this applies when the patch was sourced from a downstream distribution such as Debian, Ubuntu,
+or Red Hat.
+
+This also applies to patches taken from another Yocto layer (e.g., oe-core or
+meta-openembedded) whose `Upstream-Status:` does not reflect where the patch itself came
+from. In that case, use the URL of the patch file in the upstream Yocto layer as the
+`Origin:`.
+
+`Origin:` is complementary to `Upstream-Status:`:
+* `Upstream-Status:` describes the patch's relationship to the upstream project.
+  * i.e., at what point can this patch be removed?
+* `Origin:` points to the specific source the patch was copied from.
+  * i.e., where did this patch come from?
+
+Example:
+
+```
+Upstream-Status: Backport [https://upstream.example.org/commit/abc123]
+Origin: https://salsa.debian.org/debian/foo/-/raw/debian/main/debian/patches/CVE-YYYY-NNNNN.patch
+```
+
+Maintainers will reject patches whose content significantly diverges from the referenced
+`Origin:` or `Upstream-Status:` source. Trivial adjustments (context offsets, path renames,
+whitespace) are expected and fine.
+
+See the [DEP-3](https://dep-team.pages.debian.net/deps/dep3/) standard for more details.
 
 ## 4. Patch Submission & Review
 
@@ -95,3 +140,5 @@ To add this layer to your build, run:
 ```shell
 bitbake-layers add-layer meta-lts-collab
 ```
+
+[yp-contrib]: https://docs.yoctoproject.org/contributor-guide/index.html
