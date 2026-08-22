@@ -11,7 +11,11 @@ permissions:
   pages: write
 
 jobs:
-  periodic:
-    uses: ./.github/workflows/_periodic.yml
+  common:
+    name: "Common"
+    uses: ./.github/workflows/_common.yml
     with:
       target-image: core-image-ptest-fast
+
+  update-cve-dashboard:
+    uses: ./.github/workflows/_update-cve-dashboard.yml
