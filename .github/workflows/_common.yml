@@ -1,0 +1,52 @@
+---
+# Reusable workflow: Shared workflow for all jobs
+name: '[Reusable] Common jobs'
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      run-tests:
+        description: 'If "true", run testimage after the build'
+        required: false
+        default: true
+        type: boolean
+      only-build-modified:
+        description: 'If "true", only build recipes that have changed'
+        required: false
+        default: false
+        type: boolean
+      target-image:
+        description: 'The image that is intended to be built'
+        required: false
+        default: 'core-image-minimal'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.github/workflows/_lint.yml
+
+  check-layer:
+    name: Check layer
+    needs: lint
+    uses: ./.github/workflows/_yocto-check-layer.yml
+    with:
+      branch: dunfell
+      runner: ubuntu-22.04
+
+  build:
+    name: 'Build (systemd=${{ matrix.systemd }})'
+    needs: check-layer
+    strategy:
+      matrix:
+        systemd: [true, false]
+    uses: ./.github/workflows/_bitbake.yml
+    with:
+      branch: dunfell
+      runner: yocto_build_host
+      only-build-modified: ${{ inputs.only-build-modified }}
+      run-tests: ${{ inputs.run-tests }}
+      target-image: ${{ inputs.target-image }}
+      use-systemd: ${{ matrix.systemd }}

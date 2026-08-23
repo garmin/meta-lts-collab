@@ -8,35 +8,15 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint
-    uses: ./.github/workflows/_lint.yml
-
-  check-layer:
-    name: Check layer
-    needs: lint
-    uses: ./.github/workflows/_yocto-check-layer.yml
+  common:
+    name: "Common"
+    uses: ./.github/workflows/_common.yml
     with:
-      branch: ${{ github.base_ref }}
-      runner: ubuntu-22.04
-
-  build:
-    name: 'Build (systemd=${{ matrix.systemd }})'
-    needs: check-layer
-    strategy:
-      matrix:
-        systemd: [true, false]
-    uses: ./.github/workflows/_bitbake.yml
-    with:
-      branch: ${{ github.base_ref }}
-      runner: yocto_build_host
       only-build-modified: true
-      run-tests: true
-      use-systemd: ${{ matrix.systemd }}
 
   validate-pr-status:
     name: Required checks pass
-    needs: [lint, check-layer, build]
+    needs: common
     if: always()
     runs-on: ubuntu-22.04
     steps:
