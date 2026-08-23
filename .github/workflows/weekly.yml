@@ -16,7 +16,6 @@ jobs:
     uses: ./.github/workflows/_common.yml
     with:
       target-image: core-image-ptest-all
-      use-cache: false
 
   update-cve-dashboard:
     uses: ./.github/workflows/_update-cve-dashboard.yml

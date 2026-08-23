@@ -31,11 +31,6 @@ on:  # yamllint disable-line rule:truthy
         required: false
         default: false
         type: boolean
-      use-cache:
-        description: 'If "true", restore downloads and sstate before the build'
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -71,7 +66,7 @@ jobs:
           append: 'true'
 
       - name: Restore downloads and sstate
-        if: ${{ inputs.use-cache && steps.targets.outputs.all_build_targets != '' }}
+        if: ${{ steps.targets.outputs.all_build_targets != '' }}
         uses: ./.github/actions/restore-build-cache
         with:
           branch: ${{ inputs.branch }}

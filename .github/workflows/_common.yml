@@ -19,11 +19,6 @@ on:  # yamllint disable-line rule:truthy
         required: false
         default: 'core-image-minimal'
         type: string
-      use-cache:
-        description: 'If "true", restore downloads and sstate before the build'
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -54,5 +49,4 @@ jobs:
       only-build-modified: ${{ inputs.only-build-modified }}
       run-tests: ${{ inputs.run-tests }}
       target-image: ${{ inputs.target-image }}
-      use-cache: ${{ inputs.use-cache }}
       use-systemd: ${{ matrix.systemd }}
