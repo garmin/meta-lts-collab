@@ -31,11 +31,6 @@ on:  # yamllint disable-line rule:truthy
         required: false
         default: false
         type: boolean
-      use-cache:
-        description: 'If "true", restore downloads and sstate before the build'
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -71,7 +66,7 @@ jobs:
           append: 'true'
 
       - name: Restore downloads and sstate
-        if: ${{ inputs.use-cache && steps.targets.outputs.all_build_targets != '' }}
+        if: ${{ steps.targets.outputs.all_build_targets != '' }}
         uses: ./.github/actions/restore-build-cache
         with:
           branch: ${{ inputs.branch }}
@@ -79,12 +74,25 @@ jobs:
           systemd: ${{ inputs.use-systemd }}
 
       - name: bitbake ${{ inputs.target-image }}
+        id: bitbake
         if: ${{ steps.targets.outputs.all_build_targets != '' }}
         working-directory: ${{ github.workspace }}
         run: |
           source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           source poky/oe-init-build-env
           bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
+
+      - name: Save downloads and sstate
+        if: ${{ steps.targets.outputs.all_build_targets != '' && !contains('skipped,cancelled', steps.bitbake.outcome) && always() }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: |
+            ${{ github.workspace }}/build/downloads
+            ${{ github.workspace }}/build/sstate-cache
+          key:
+            "downloads-and-sstate-${{ inputs.branch }}-\
+            ${{ inputs.use-systemd && 'systemd' || 'sysvinit' }}-\
+            ${{ github.run_id }}-${{ github.run_attempt }}"
 
       - name: Enable KVM permissions
         if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
@@ -101,15 +109,3 @@ jobs:
           source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           source poky/oe-init-build-env
           bitbake -c testimage ${{ inputs.target-image }}
-
-      - name: Save downloads and sstate
-        if: ${{ always() && steps.targets.outputs.all_build_targets != '' }}
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
-        with:
-          path: |
-            ${{ github.workspace }}/build/downloads
-            ${{ github.workspace }}/build/sstate-cache
-          key:
-            "downloads-and-sstate-${{ inputs.branch }}-\
-            ${{ inputs.use-systemd && 'systemd' || 'sysvinit' }}-\
-            ${{ github.run_id }}-${{ github.run_attempt }}"

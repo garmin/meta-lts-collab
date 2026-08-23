@@ -2,36 +2,17 @@
 name: Weekly
 on:  # yamllint disable-line rule:truthy
   schedule:
-    - cron: "0 3 * * SUN"
+    - cron: "0 3 * * 0"
   workflow_dispatch:
 
 permissions:
   contents: read
+  id-token: write
+  pages: write
 
 jobs:
-  lint:
-    name: Lint
-    uses: ./.github/workflows/_lint.yml
-
-  check-layer:
-    name: Check layer
-    needs: lint
-    uses: ./.github/workflows/_yocto-check-layer.yml
+  common:
+    name: "Common"
+    uses: ./.github/workflows/_common.yml
     with:
-      branch: dunfell
-      runner: ubuntu-22.04
-
-  build:
-    name: 'Build (systemd=${{ matrix.systemd }})'
-    needs: check-layer
-    strategy:
-      matrix:
-        systemd: [true, false]
-    uses: ./.github/workflows/_bitbake.yml
-    with:
-      branch: dunfell
-      runner: yocto_build_host
-      only-build-modified: false
-      run-tests: ${{ github.event_name == 'schedule' }}
-      use-cache: false
-      use-systemd: ${{ matrix.systemd }}
+      target-image: core-image-ptest-all
