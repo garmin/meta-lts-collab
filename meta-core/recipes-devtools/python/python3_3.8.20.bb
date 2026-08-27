@@ -55,6 +55,7 @@ SRC_URI_append = " \
     file://CVE-2024-9287.patch \
     file://CVE-2025-13836.patch \
     file://0001-test_concurrent_futures-skip-flaky-tests-for-3.8.patch \
+    file://CVE-2025-13462.patch \
 "
 
 SRC_URI[sha256sum] = "6fb89a7124201c61125c0ab4cf7f6894df339a40c02833bfd28ab4d7691fafb4"
