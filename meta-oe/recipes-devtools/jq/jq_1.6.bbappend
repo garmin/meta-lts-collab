@@ -4,6 +4,7 @@ SRC_URI_append = " \
     file://CVE-2024-23337.patch \
     file://CVE-2025-48060.patch \
     file://CVE-2026-39979.patch \
+    file://CVE-2026-33948.patch \
     "
 
 # fixed-version: Does not affect jq 1.6.
