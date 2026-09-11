@@ -1,3 +1,9 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
+
+SRC_URI:append = " \
+    file://CVE-2026-1467.patch \
+"
+
 # CVE was reported against the common header workflow within the Libsoup 3 library.
 # Libsoup 2.4 does not differentiate between common and uncommon headers and has a
 # single header processing workflow which prevents CR/LF characters in header values
