@@ -1,5 +1,5 @@
 ---
-# Reusable workflow: run ruff, yamllint, and oelint-adv against the repo.
+# Reusable workflow: run zizmor, ruff, yamllint, and oelint-adv against the repo.
 name: '[Reusable] Lint'
 on:  # yamllint disable-line rule:truthy
   workflow_call:
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
@@ -28,6 +30,9 @@ jobs:
 
       - name: Install tools
         run: pip install -r requirements-dev.txt
+
+      - name: Run zizmor on workflows
+        run: zizmor .
 
       - name: Run ruff check on scripts
         run: ruff check meta-lts-collab-test/scripts
@@ -39,4 +44,4 @@ jobs:
         run: yamllint .github/
 
       - name: Run oelint-adv
-        run: oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')
+        run: oelint-adv "$(find . -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')"
