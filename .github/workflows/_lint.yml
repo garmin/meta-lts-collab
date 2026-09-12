@@ -39,4 +39,4 @@ jobs:
         run: yamllint .github/
 
       - name: Run oelint-adv
-        run: oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')
+        run: oelint-adv "$(find . -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')"
