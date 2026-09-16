@@ -65,9 +65,10 @@ itself a contribution, so whoever imports it must sign it off to satisfy the
 #### `Origin:` tag
 
 The `Origin:` tag records where the patch was sourced from, and is required whenever
-the patch was not taken directly from the upstream project's own fix commit. For example,
-this applies when the patch was sourced from a downstream distribution such as Debian, Ubuntu,
-or Red Hat.
+the patch was not taken directly from the upstream project's own fix commit. As with
+the `Signed-off-by:` line, this tag should be placed within the patch file being
+submitted. For example, this applies when the patch was sourced from a downstream
+distribution such as Debian, Ubuntu, or Red Hat.
 
 This also applies to patches taken from another Yocto layer (e.g., oe-core or
 meta-openembedded) whose `Upstream-Status:` does not reflect where the patch itself came
