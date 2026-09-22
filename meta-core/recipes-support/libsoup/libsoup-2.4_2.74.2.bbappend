@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append = " \
     file://CVE-2026-1467.patch \
     file://CVE-2026-1539.patch \
+    file://CVE-2026-1801.patch \
 "
 
 # CVE was reported against the common header workflow within the Libsoup 3 library.
