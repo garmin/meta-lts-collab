@@ -5,6 +5,7 @@ SRC_URI:append = " \
     file://CVE-2026-1539.patch \
     file://CVE-2026-1801.patch \
     file://CVE-2026-2443.patch \
+    file://CVE-2026-5119.patch \
 "
 
 # CVE was reported against the common header workflow within the Libsoup 3 library.
