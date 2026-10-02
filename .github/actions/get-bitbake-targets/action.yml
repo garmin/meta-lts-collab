@@ -60,7 +60,7 @@ runs:
     - uses: ./.github/actions/write-file
       with:
         content: |
-          require ${{ inputs.build-dir }}/meta-lts-collab/conf/ci.conf
+          require ${{ inputs.build-dir }}/meta-lts-collab/meta-lts-collab-test/conf/ci.conf
           CORE_IMAGE_EXTRA_INSTALL = "${{ steps.targets.outputs.image_targets }}"
         path: ${{ inputs.build-dir }}/build/conf/auto.conf
         append: 'true'
