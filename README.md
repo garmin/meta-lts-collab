@@ -121,12 +121,12 @@ Trigger-specific behavior:
 - **Pull requests** (`dunfell`): build only the recipes directly affected by the PR and run
   `do_testimage` (ptests) on the resulting image.
 - **Push** (`dunfell`): build every recipe added or modified by the layer
-- **Weekly** (Sundays 03:00 UTC): same as push, but refresh the downloads and sstate cache
-  from scratch and also run `do_testimage`.
 
 Dependent-recipe breakage (e.g. a meta-core or meta-oe recipe that consumes a modified recipe) is
 not detected — catching it would require a full `bitbake world`, which may be revisited if cache
 sizes grow. See [`.github/workflows`](.github/workflows) for full configuration.
+
+> Note: Periodic jobs are run from the default branch, please reference the readme on that branch for more details.
 
 ## 7. Terms of Use / Disclaimer
 
