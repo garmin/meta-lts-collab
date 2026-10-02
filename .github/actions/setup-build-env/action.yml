@@ -73,6 +73,7 @@ runs:
         bitbake-layers add-layer "${{ inputs.build-dir }}"/meta-oe/meta-*
         if [ "$BBLAYERS_ADD_LTS_COLLAB" = "true" ]; then
           bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab"
+          bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab/meta-lts-collab-test"
         fi
         actual_tar=$(which tar)
         if [[ "$actual_tar" != *buildtools* ]]; then
