@@ -172,14 +172,15 @@ validation can be performed locally by following the steps below:
 
     ```
     $ source poky/oe-init-build-env
-    $ bitbake-layers add-layer ./meta-openembedded/meta-*
-    $ bitbake-layers add-layer ./meta-lts-collab
+    $ bitbake-layers add-layer ../meta-openembedded/meta-*
+    $ bitbake-layers add-layer ../meta-lts-collab
+    $ bitbake-layers add-layer ../meta-lts-collab/meta-lts-collab-test
     ```
 
 4. Add configurations to local.conf
 
     ```
-    $ echo "require $(realpath ./meta-lts-collab/conf/ci.conf)" >> "./build/conf/local.conf"
+    $ echo "require $(realpath ./meta-lts-collab/meta-lts-collab-test/conf/ci.conf)" >> "./build/conf/local.conf"
     ```
 
 5. Add packages to build and test
