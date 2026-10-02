@@ -42,8 +42,8 @@ runs:
         else
           args=""
         fi
-        NATIVE_TARGETS=$(./scripts/get-bitbake-targets.py --native ${args})
-        IMAGE_TARGETS=$(./scripts/get-bitbake-targets.py --image ${args})
+        NATIVE_TARGETS=$(./meta-lts-collab-test/scripts/get-bitbake-targets.py --native ${args})
+        IMAGE_TARGETS=$(./meta-lts-collab-test/scripts/get-bitbake-targets.py --image ${args})
         if [ -n "$NATIVE_TARGETS" ] && [ -n "$IMAGE_TARGETS" ]; then
           ALL_BUILD_TARGETS="$NATIVE_TARGETS $IMAGE_TARGETS"
         elif [ -n "$NATIVE_TARGETS" ]; then
