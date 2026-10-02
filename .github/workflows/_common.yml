@@ -4,11 +4,20 @@ name: '[Reusable] Common jobs'
 on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
+      branch:
+        description: 'The Yocto version to use'
+        required: true
+        type: string
       use-buildtools:
         description: 'If "true", install buildtools before building (required for older branches like Dunfell)'
         required: false
         default: false
         type: boolean
+      meta-lts-collab-ref:
+        description: 'The git reference for the meta-lts-collab layer'
+        required: false
+        default: ''
+        type: string
       run-tests:
         description: 'If "true", run testimage after the build'
         required: false
@@ -38,8 +47,9 @@ jobs:
     needs: lint
     uses: ./.github/workflows/_yocto-check-layer.yml
     with:
-      branch: kirkstone
+      branch: ${{ inputs.branch }}
       use-buildtools: ${{ inputs.use-buildtools }}
+      meta-lts-collab-ref: ${{ inputs.meta-lts-collab-ref }}
       runner: ubuntu-22.04
 
   build:
@@ -50,8 +60,9 @@ jobs:
         systemd: [true, false]
     uses: ./.github/workflows/_bitbake.yml
     with:
-      branch: kirkstone
+      branch: ${{ inputs.branch }}
       use-buildtools: ${{ inputs.use-buildtools }}
+      meta-lts-collab-ref: ${{ inputs.meta-lts-collab-ref }}
       runner: yocto_build_host
       only-build-modified: ${{ inputs.only-build-modified }}
       run-tests: ${{ inputs.run-tests }}

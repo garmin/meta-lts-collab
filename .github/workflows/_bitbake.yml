@@ -58,6 +58,7 @@ jobs:
           branch: ${{ inputs.branch }}
           build-dir: ${{ github.workspace }}
           use-buildtools: ${{ inputs.use-buildtools }}
+          meta-lts-collab-ref: ${{ inputs.meta-lts-collab-ref }}
 
       - uses: ./.github/actions/get-bitbake-targets
         id: targets

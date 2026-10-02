@@ -15,6 +15,7 @@ jobs:
     name: "Common"
     uses: ./.github/workflows/_common.yml
     with:
+      branch: kirkstone
       target-image: core-image-ptest-fast
 
   update-cve-dashboard:

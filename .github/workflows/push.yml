@@ -14,4 +14,5 @@ jobs:
     name: "Common"
     uses: ./.github/workflows/_common.yml
     with:
+      branch: kirkstone
       run-tests: false
