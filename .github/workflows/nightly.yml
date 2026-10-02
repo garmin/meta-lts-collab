@@ -12,10 +12,19 @@ permissions:
 
 jobs:
   common:
-    name: "Common"
+    name: "Common (${{ matrix.branch }})"
+    strategy:
+      matrix:
+        include:
+          - branch: dunfell
+            use-buildtools: true
+          - branch: kirkstone
+            use-buildtools: false
     uses: ./.github/workflows/_common.yml
     with:
-      branch: kirkstone
+      branch: ${{ matrix.branch }}
+      use-buildtools: ${{ matrix.use-buildtools }}
+      meta-lts-collab-ref: ${{ matrix.branch }}
       target-image: core-image-ptest-fast
 
   update-cve-dashboard:
