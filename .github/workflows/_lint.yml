@@ -30,10 +30,10 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Run ruff check on scripts
-        run: ruff check scripts
+        run: ruff check meta-lts-collab-test/scripts
 
       - name: Run ruff format --check on scripts
-        run: ruff format --check scripts/
+        run: ruff format --check meta-lts-collab-test/scripts/
 
       - name: Run yamllint on workflows
         run: yamllint .github/

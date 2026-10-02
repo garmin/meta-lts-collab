@@ -190,10 +190,10 @@ validation can be performed locally by following the steps below:
     CORE_IMAGE_EXTRA_INSTALL = "openssl"
     ```
 
-    - To build all packages of this layer, meta-lts-collab/scripts/get-bitbake-targets.py can be used
+    - To build all packages of this layer, meta-lts-collab/meta-lts-collab-test/scripts/get-bitbake-targets.py can be used
 
     ```
-    echo "CORE_IMAGE_EXTRA_INSTALL = \"$(./meta-lts-collab/scripts/get-bitbake-targets.py --image)\"" >> build/conf/local.conf
+    echo "CORE_IMAGE_EXTRA_INSTALL = \"$(./meta-lts-collab/meta-lts-collab-test/scripts/get-bitbake-targets.py --image)\"" >> build/conf/local.conf
     ```
 
 6. Build and run test image
