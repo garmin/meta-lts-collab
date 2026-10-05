@@ -56,10 +56,9 @@ runs:
       shell: bash
       working-directory: ${{ inputs.build-dir }}
       run: |
-        $GITHUB_WORKSPACE/poky/scripts/install-buildtools \
-          -u https://downloads.yoctoproject.org/releases/yocto/yocto-3.1.33/buildtools/ \
+        ${{ inputs.build-dir }}/poky/scripts/install-buildtools \
           --without-extended-buildtools \
-          -d $GITHUB_WORKSPACE/buildtools
+          -d ${{ inputs.build-dir }}/buildtools
 
     - name: Initialize build directory
       shell: bash
@@ -73,6 +72,7 @@ runs:
         bitbake-layers add-layer "${{ inputs.build-dir }}"/meta-oe/meta-*
         if [ "$BBLAYERS_ADD_LTS_COLLAB" = "true" ]; then
           bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab"
+          bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab/meta-lts-collab-test"
         fi
         actual_tar=$(which tar)
         if [[ "$actual_tar" != *buildtools* ]]; then
