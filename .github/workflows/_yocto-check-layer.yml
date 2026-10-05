@@ -8,6 +8,16 @@ on:  # yamllint disable-line rule:truthy
         description: 'The Yocto branch to run yocto-check-layer against'
         required: true
         type: string
+      use-buildtools:
+        description: 'If "true", install buildtools before checking the layer (required for older branches like Dunfell)'
+        required: false
+        default: false
+        type: boolean
+      meta-lts-collab-ref:
+        description: 'The git reference for the meta-lts-collab layer'
+        required: false
+        default: ''
+        type: string
       runner:
         description: 'The runner to execute this workflow on'
         required: false
@@ -29,11 +39,16 @@ jobs:
         with:
           branch: ${{ inputs.branch }}
           build-dir: ${{ github.workspace }}
+          use-buildtools: ${{ inputs.use-buildtools }}
+          meta-lts-collab-ref: ${{ inputs.meta-lts-collab-ref }}
           bblayers-add-lts-collab: false
 
       - name: Run yocto-check-layer
         working-directory: ${{ github.workspace }}
         run: |
+          if [ -d "$GITHUB_WORKSPACE/buildtools" ]; then
+            source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
+          fi
           source poky/oe-init-build-env
           yocto-check-layer \
             --without-software-layer-signature-check \

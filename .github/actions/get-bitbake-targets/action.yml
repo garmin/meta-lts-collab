@@ -42,8 +42,8 @@ runs:
         else
           args=""
         fi
-        NATIVE_TARGETS=$(./scripts/get-bitbake-targets.py --native ${args})
-        IMAGE_TARGETS=$(./scripts/get-bitbake-targets.py --image ${args})
+        NATIVE_TARGETS=$(./meta-lts-collab-test/scripts/get-bitbake-targets.py --native ${args})
+        IMAGE_TARGETS=$(./meta-lts-collab-test/scripts/get-bitbake-targets.py --image ${args})
         if [ -n "$NATIVE_TARGETS" ] && [ -n "$IMAGE_TARGETS" ]; then
           ALL_BUILD_TARGETS="$NATIVE_TARGETS $IMAGE_TARGETS"
         elif [ -n "$NATIVE_TARGETS" ]; then
@@ -60,7 +60,7 @@ runs:
     - uses: ./.github/actions/write-file
       with:
         content: |
-          require ${{ inputs.build-dir }}/meta-lts-collab/conf/ci.conf
+          require ${{ inputs.build-dir }}/meta-lts-collab/meta-lts-collab-test/conf/ci.conf
           CORE_IMAGE_EXTRA_INSTALL = "${{ steps.targets.outputs.image_targets }}"
         path: ${{ inputs.build-dir }}/build/conf/auto.conf
         append: 'true'
