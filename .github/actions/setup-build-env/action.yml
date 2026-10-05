@@ -56,10 +56,9 @@ runs:
       shell: bash
       working-directory: ${{ inputs.build-dir }}
       run: |
-        $GITHUB_WORKSPACE/poky/scripts/install-buildtools \
-          -u https://downloads.yoctoproject.org/releases/yocto/yocto-3.1.33/buildtools/ \
+        ${{ inputs.build-dir }}/poky/scripts/install-buildtools \
           --without-extended-buildtools \
-          -d $GITHUB_WORKSPACE/buildtools
+          -d ${{ inputs.build-dir }}/buildtools
 
     - name: Initialize build directory
       shell: bash
