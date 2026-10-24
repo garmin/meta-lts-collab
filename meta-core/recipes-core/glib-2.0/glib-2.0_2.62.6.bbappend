@@ -35,3 +35,6 @@ SRC_URI_append = " \
     file://CVE-2026-58016-01.patch \
     file://CVE-2026-58016-02.patch \
     "
+
+# not-applicable-platform: Issue only applies on Windows
+CVE_CHECK_WHITELIST += "CVE-2025-4056"
