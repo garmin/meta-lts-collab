@@ -12,6 +12,7 @@ jobs:
     name: "Common"
     uses: ./.github/workflows/_common.yml
     with:
+      branch: kirkstone
       only-build-modified: true
 
   validate-pr-status:

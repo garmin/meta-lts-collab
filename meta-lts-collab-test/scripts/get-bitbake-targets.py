@@ -4,6 +4,8 @@ from enum import Enum
 from itertools import chain
 from pathlib import Path
 
+TEST_LAYER_DIR = Path(__file__).resolve().parent.parent
+LAYER_DIR = TEST_LAYER_DIR.parent
 NATIVE_ONLY_FILE = Path(__file__).resolve().parent / "native-only.txt"
 NATIVE_ONLY_BPNS = {
     line.strip() for line in NATIVE_ONLY_FILE.read_text().splitlines() if line.strip()
@@ -19,6 +21,11 @@ class BPNFilter(Enum):
     ALL = "all"
     IMAGE = "image"
     NATIVE = "native"
+
+
+def is_in_test_layer(path: Path) -> bool:
+    """Returns True if the path is inside meta-lts-collab-test (relative paths resolve from the cwd)."""
+    return path.resolve().is_relative_to(TEST_LAYER_DIR)
 
 
 def get_bpn(pn_path: Path) -> str:
@@ -60,6 +67,7 @@ def get_modified_bpns(modified_files: list[Path]) -> list[str]:
     Returns:
         List[str]: All BPNs that are associated with the modified file.
     """
+    modified_files = [f for f in modified_files if not is_in_test_layer(f)]
     # We should be safe and build everything if a .conf or .bbclass file is modified
     if any(
         filter(
@@ -78,12 +86,12 @@ def get_all_bpns() -> list[str]:
     Returns:
         List[str]: List of all BPNs found in the layer.
     """
-    layer_dir = Path(__file__).resolve().parent.parent
     return sorted(
         map(
             get_bpn,
             filter(
-                lambda x: x.suffix in (".bb", ".bbappend"), layer_dir.rglob("*.bb*")
+                lambda x: x.suffix in (".bb", ".bbappend") and not is_in_test_layer(x),
+                LAYER_DIR.rglob("*.bb*"),
             ),
         )
     )

@@ -10,6 +10,10 @@ inputs:
     description: 'Absolute dir containing poky/, meta-oe/, meta-lts-collab/, build/'
     required: false
     default: ${{ github.workspace }}
+  use-buildtools:
+    description: 'Install Yocto buildtools (required for older branches like Dunfell)'
+    required: false
+    default: false
   meta-lts-collab-ref:
     description: 'Reference of meta-lts-collab to use'
     required: false
@@ -52,14 +56,28 @@ runs:
         ref: ${{ inputs.branch }}
         path: ${{ inputs.build-dir }}/meta-oe
 
+    - name: Install build tools
+      if: ${{ inputs.use-buildtools == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.build-dir }}
+      run: |
+        ${{ inputs.build-dir }}/poky/scripts/install-buildtools \
+          --without-extended-buildtools \
+          -d ${{ inputs.build-dir }}/buildtools
+
     - name: Initialize build directory
       shell: bash
       working-directory: ${{ inputs.build-dir }}
       env:
         BBLAYERS_ADD_LTS_COLLAB: ${{ inputs.bblayers-add-lts-collab }}
       run: |
+        if [ -d "$GITHUB_WORKSPACE/buildtools" ]; then
+          rm -rf "${{ inputs.build-dir }}/build/tmp/hosttools"
+          source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
+        fi
         source poky/oe-init-build-env
         bitbake-layers add-layer "${{ inputs.build-dir }}"/meta-oe/meta-*
         if [ "$BBLAYERS_ADD_LTS_COLLAB" = "true" ]; then
           bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab"
+          bitbake-layers add-layer "${{ inputs.build-dir }}/meta-lts-collab/meta-lts-collab-test"
         fi

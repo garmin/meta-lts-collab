@@ -65,9 +65,10 @@ itself a contribution, so whoever imports it must sign it off to satisfy the
 #### `Origin:` tag
 
 The `Origin:` tag records where the patch was sourced from, and is required whenever
-the patch was not taken directly from the upstream project's own fix commit. For example,
-this applies when the patch was sourced from a downstream distribution such as Debian, Ubuntu,
-or Red Hat.
+the patch was not taken directly from the upstream project's own fix commit. As with
+the `Signed-off-by:` line, this tag should be placed within the patch file being
+submitted. For example, this applies when the patch was sourced from a downstream
+distribution such as Debian, Ubuntu, or Red Hat.
 
 This also applies to patches taken from another Yocto layer (e.g., oe-core or
 meta-openembedded) whose `Upstream-Status:` does not reflect where the patch itself came
@@ -174,14 +175,15 @@ validation can be performed locally by following the steps below:
 
     ```
     $ source poky/oe-init-build-env
-    $ bitbake-layers add-layer ./meta-openembedded/meta-*
-    $ bitbake-layers add-layer ./meta-lts-collab
+    $ bitbake-layers add-layer ../meta-openembedded/meta-*
+    $ bitbake-layers add-layer ../meta-lts-collab
+    $ bitbake-layers add-layer ../meta-lts-collab/meta-lts-collab-test
     ```
 
 4. Add configurations to local.conf
 
     ```
-    $ echo "require $(realpath ./meta-lts-collab/conf/ci.conf)" >> "./build/conf/local.conf"
+    $ echo "require $(realpath ./meta-lts-collab/meta-lts-collab-test/conf/ci.conf)" >> "./build/conf/local.conf"
     ```
 
 5. Add packages to build and test
@@ -191,10 +193,10 @@ validation can be performed locally by following the steps below:
     CORE_IMAGE_EXTRA_INSTALL = "openssl"
     ```
 
-    - To build all packages of this layer, meta-lts-collab/scripts/get-bitbake-targets.py can be used
+    - To build all packages of this layer, meta-lts-collab/meta-lts-collab-test/scripts/get-bitbake-targets.py can be used
 
     ```
-    echo "CORE_IMAGE_EXTRA_INSTALL = \"$(./meta-lts-collab/scripts/get-bitbake-targets.py --image)\"" >> build/conf/local.conf
+    echo "CORE_IMAGE_EXTRA_INSTALL = \"$(./meta-lts-collab/meta-lts-collab-test/scripts/get-bitbake-targets.py --image)\"" >> build/conf/local.conf
     ```
 
 6. Build and run test image
