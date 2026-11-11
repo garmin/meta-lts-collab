@@ -7,8 +7,6 @@ on:  # yamllint disable-line rule:truthy
 
 permissions:
   contents: read
-  id-token: write
-  pages: write
 
 jobs:
   common:
@@ -29,3 +27,7 @@ jobs:
 
   update-cve-dashboard:
     uses: ./.github/workflows/_update-cve-dashboard.yml
+    permissions:
+      contents: read
+      id-token: write
+      pages: write

@@ -52,6 +52,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-build-env
         with:
@@ -86,16 +88,20 @@ jobs:
           build-dir: ${{ github.workspace }}
           systemd: ${{ inputs.use-systemd }}
 
-      - name: bitbake ${{ inputs.target-image }}
+      - name: Build image and native targets
         id: bitbake
         if: ${{ steps.targets.outputs.all_build_targets != '' }}
         working-directory: ${{ github.workspace }}
+        env:
+          TARGET_IMAGE: ${{ inputs.target-image }}
+          NATIVE_TARGETS: ${{ steps.targets.outputs.native_targets }}
         run: |
           if [ -d "$GITHUB_WORKSPACE/buildtools" ]; then
             source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           fi
           source poky/oe-init-build-env
-          bitbake ${{ inputs.target-image }} ${{ steps.targets.outputs.native_targets }}
+          read -r -a native_targets <<< "$NATIVE_TARGETS"
+          bitbake "$TARGET_IMAGE" "${native_targets[@]}"
 
       - name: Save downloads and sstate
         if: ${{ steps.targets.outputs.all_build_targets != '' && !contains('skipped,cancelled', steps.bitbake.outcome) && always() }}
@@ -120,9 +126,11 @@ jobs:
       - name: bitbake testimage
         if: ${{ inputs.run-tests && steps.targets.outputs.image_targets != '' }}
         working-directory: ${{ github.workspace }}
+        env:
+          TARGET_IMAGE: ${{ inputs.target-image }}
         run: |
           if [ -d "$GITHUB_WORKSPACE/buildtools" ]; then
             source "$GITHUB_WORKSPACE/buildtools/environment-setup-x86_64-pokysdk-linux"
           fi
           source poky/oe-init-build-env
-          bitbake -c testimage ${{ inputs.target-image }}
+          bitbake -c testimage "$TARGET_IMAGE"

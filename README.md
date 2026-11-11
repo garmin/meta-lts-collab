@@ -125,6 +125,8 @@ The following linting tools should be used:
   - Lints Bitbake files
 - ruff
   - Formats and lints Python files
+- zizmor
+  - Audits GitHub Actions workflows
 - yamllint
   - Checks formatting of YAML files
 
@@ -145,6 +147,7 @@ $ python3 -m pip install -r requirements-dev.txt
 $ oelint-adv $(find -name '*.bb' -o -name '*.bbappend' -o -name '*.conf')
 $ ruff format .
 $ ruff check .
+$ zizmor .
 $ yamllint .
 ```
 
@@ -208,7 +211,7 @@ validation can be performed locally by following the steps below:
 
 ## 7. Continuous Integration (CI)
 
-Every trigger runs the same gated pipeline: **lint** (`ruff`, `yamllint`, `oelint-adv`) →
+Every trigger runs the same gated pipeline: **lint** (`zizmor`, `ruff`, `yamllint`, `oelint-adv`) →
 **yocto-check-layer** → **`core-image-minimal` build** on `qemux86-64`, matrixed over sysvinit
 and systemd.
 

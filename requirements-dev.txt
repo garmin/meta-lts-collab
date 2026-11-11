@@ -1,3 +1,4 @@
 oelint-adv==9.11.3
 ruff==0.17.4
 yamllint==1.38.0
+zizmor==0.8.0

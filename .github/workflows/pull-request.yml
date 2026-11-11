@@ -22,9 +22,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check all jobs succeeded
+        env:
+          HAS_FAILED_JOBS: ${{ contains(needs.*.result, 'failure') }}
+          HAS_CANCELLED_JOBS: ${{ contains(needs.*.result, 'cancelled') }}
         run: |
-          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ] || \
-             [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+          if [ "$HAS_FAILED_JOBS" = "true" ] || \
+             [ "$HAS_CANCELLED_JOBS" = "true" ]; then
             echo "One or more required jobs failed"
             exit 1
           fi
