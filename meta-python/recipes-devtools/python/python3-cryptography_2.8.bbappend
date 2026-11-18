@@ -9,3 +9,6 @@ CVE_CHECK_WHITELIST += "CVE-2024-26130"
 do_install_ptest_append() {
     rm -rf ${D}${PTEST_PATH}/tests/hypothesis
 }
+
+# pytest's tmpdir fixture imports getpass, which is in python3-unixadmin
+RDEPENDS_${PN}-ptest += "${PYTHON_PN}-unixadmin"
