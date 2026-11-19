@@ -12,3 +12,11 @@ do_install_ptest_append() {
 
 # pytest's tmpdir fixture imports getpass, which is in python3-unixadmin
 RDEPENDS_${PN}-ptest += "${PYTHON_PN}-unixadmin"
+
+# Register the custom pytest marks, see pytest.ini
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+SRC_URI_append = " file://pytest.ini"
+
+do_install_ptest_append() {
+    install -m 0644 ${WORKDIR}/pytest.ini ${D}${PTEST_PATH}/
+}
