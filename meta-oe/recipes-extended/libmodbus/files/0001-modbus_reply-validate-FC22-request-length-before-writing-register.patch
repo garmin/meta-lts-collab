@@ -1,0 +1,43 @@
+From 9b99334df2b7c77b9bfeddcdd0e65becfb08d616 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?St=C3=A9phane=20Raimbault?= <stephane.raimbault@gmail.com>
+Date: Thu, 2 Jul 2026 03:00:44 +0200
+Subject: [PATCH] modbus_reply: validate FC22 request length before writing
+ register
+
+Upstream-Status: Backport [https://github.com/stephane/libmodbus/commit/9b99334df2b7c77b9bfeddcdd0e65becfb08d616]
+Signed-off-by: Jabar Asadi <azhovan@outlook.com>
+
+---
+ src/modbus.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/src/modbus.c b/src/modbus.c
+index c2c8f7c..bba99d8 100644
+--- a/src/modbus.c
++++ b/src/modbus.c
+@@ -967,13 +967,10 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
+                 "Illegal data address 0x%0X in write_register\n",
+                 address);
+         } else {
+-            uint16_t data = mb_mapping->tab_registers[mapping_address];
++            uint16_t data;
+             uint16_t and = (req[offset + 3] << 8) + req[offset + 4];
+             uint16_t or = (req[offset + 5] << 8) + req[offset + 6];
+ 
+-            data = (data & and) | (or & (~and));
+-            mb_mapping->tab_registers[mapping_address] = data;
+-
+             rsp_length = compute_response_length_from_request(ctx, (uint8_t *) req);
+             if (rsp_length != req_length) {
+                 /* Bad use of modbus_reply */
+@@ -988,6 +985,10 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
+                 break;
+             }
+ 
++            data = mb_mapping->tab_registers[mapping_address];
++            data = (data & and) | (or & (~and));
++            mb_mapping->tab_registers[mapping_address] = data;
++
+             rsp_length -= ctx->backend->checksum_length;
+             memcpy(rsp, req, rsp_length);
+         }
