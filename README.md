@@ -218,14 +218,18 @@ and systemd.
 Trigger-specific behavior:
 - **Pull requests** (`kirkstone`): build only the recipes directly affected by the PR and run
   `do_testimage` (ptests) on the resulting image.
-- **Push** (`kirkstone`): build every recipe added or modified by the layer, then run
-  `cve-check` against `universe` for both `dunfell` and `kirkstone` and publish the CVE
-  summaries to GitHub Pages.
+- **Push** (`kirkstone`): build every recipe added or modified by the layer.
 - **Nightly** (3:00 UTC): same as push, but also run `do_testimage` to run ptests for every
   recipe added or modified by the layer, along with PTESTS_FAST.
 - **Weekly** (Sundays 03:00 UTC): same as push, but refresh the downloads and sstate cache
   from scratch and also run `do_testimage` to run ptests for every recipe added or modified
   by the layer along with PTESTS_SLOW.
+
+Nightly and weekly runs also check `universe` for CVEs on `dunfell` and `kirkstone`,
+each with the default init configuration and with systemd enabled. GitHub Pages publishes
+one merged summary per branch. A CVE shared by both scans is counted once per recipe.
+If a scan fails or the reports disagree on a shared recipe's layer, version, or CVE
+status or details, the previous dashboard stays published.
 
 Dependent-recipe breakage (e.g. a meta-core or meta-oe recipe that consumes a modified recipe) is
 not detected — catching it would require a full `bitbake world`, which may be revisited if cache
