@@ -1,0 +1,39 @@
+From 25ec4f1b290fcfee9e8299c6ec17d0ace800136c Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Sat, 29 Mar 2025 03:00:00 +0100
+Subject: [PATCH] lib/xmlparse.c: Address clang-tidy warning
+ bugprone-narrowing-conversions
+
+Backport only the two storeAtts hunks from libexpat/libexpat#999.
+Dunfell's CVE-2021-45960 patch already made nsAttsSize unsigned.
+Match its type when assigning it to the table cursor j, as in the
+upstream base for the two counter fixes in libexpat/libexpat#1450.
+
+Upstream-Status: Backport [https://github.com/libexpat/libexpat/commit/25ec4f1b290fcfee9e8299c6ec17d0ace800136c]
+Signed-off-by: Jabar Asadi <azhovan@outlook.com>
+---
+ lib/xmlparse.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/xmlparse.c b/lib/xmlparse.c
+index 420b51a..115c5f5 100644
+--- a/lib/xmlparse.c
++++ b/lib/xmlparse.c
+@@ -3451,7 +3451,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc, const char *attStr,
+      and clear flags that say whether attributes were specified */
+   i = 0;
+   if (nPrefixes) {
+-    int j; /* hash table index */
++    unsigned int j; /* hash table index */
+     unsigned long version = parser->m_nsAttsVersion;
+ 
+     /* Detect and prevent invalid shift */
+@@ -3546,7 +3546,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc, const char *attStr,
+         if (! b)
+           return XML_ERROR_UNBOUND_PREFIX;
+ 
+-        for (j = 0; j < b->uriLen; j++) {
++        for (j = 0; j < (unsigned int)b->uriLen; j++) {
+           const XML_Char c = b->uri[j];
+           if (! poolAppendChar(&parser->m_tempPool, c))
+             return XML_ERROR_NO_MEMORY;
